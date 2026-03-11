@@ -1,23 +1,56 @@
 """
-app.py — MineGuard entry point (Module 1 + Module 2)
-Run: streamlit run app.py
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  MineGuard — Integrated Compliance System                                    ║
+║  Modules 1 & 2 combined into a single multi-page Streamlit app               ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║  Run:    streamlit run app.py                                                ║
+║  Init:   python init_db.py          (seed demo data)                         ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║  SIDEBAR NAVIGATION                                                          ║
+║    Module 1 — Compliance Tracker                                             ║
+║      📊  Dashboard          (Manager only)                                   ║
+║      📡  Monitor & Alerts   (Manager only)                                   ║
+║      ✏️   Update Milestones  (All roles)                                      ║
+║      ➕  Add Milestone       (All roles)                                     ║
+║    Module 2 — Reports                                                        ║
+║      📑  Generate Report     (All roles)                                     ║
+║      🗂️   Report Dashboard   (Manager only)                                   ║
+║      ⬇️   Export ZIP          (Manager only — sidebar button)                 ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║  DATA FLOW                                                                   ║
+║    Mod 1 entry → milestones table → Mod 2 PDF (no re-keying)                ║
+║    PDF generated → archived to data/reports_archive/ → ZIP export           ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║  SCALABILITY NOTE                                                            ║
+║    DB is SQLite by default. Migratable to PostgreSQL:                        ║
+║      1. pip install psycopg2-binary sqlalchemy                               ║
+║      2. Set DB_PATH in utils/constants.py to a pg DSN string                 ║
+║      3. Replace sqlite3.connect() in db/database.py + db/reports_db.py       ║
+║         with sqlalchemy engine or psycopg2.connect(DSN)                      ║
+║      4. Drop PRAGMA lines (SQLite-only)                                      ║
+║      5. Add pg connection pool (e.g. psycopg2.pool.ThreadedConnectionPool)   ║
+║    Schema uses ANSI SQL only — no SQLite-specific types.                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-import sys, os, sqlite3
+import sys, os, io, zipfile, sqlite3
 import streamlit as st
 from datetime import date
 
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from auth        import init_session, render_login
-from db          import init_db, get_projects, create_project, delete_project, get_milestones
-from components  import (
+from auth             import init_session, render_login
+from db               import init_db, get_projects, create_project, delete_project, get_milestones
+from db.reports_db    import init_reports_table, get_report_stats
+from components       import (
     dashboard, monitoring, update_form, add_milestone,
     officer_view, report_form, reports_dashboard,
 )
 from utils.constants  import TODAY
 from utils.validators import validate_project_start
-from db.reports_db    import init_reports_table
+
+BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
+ARCHIVE_DIR = os.path.join(BASE_DIR, "data", "reports_archive")
 
 # ══════════════════════════════════════════════════════════════════
 # PAGE CONFIG
@@ -56,7 +89,6 @@ h1,h2,h3{font-family:'IBM Plex Mono',monospace}
 
 .timeline-bar {height:8px;border-radius:4px;background:#30363d;margin:4px 0;overflow:hidden}
 .timeline-fill{height:100%;border-radius:4px}
-
 .overdue-chip{background:#3d0000;color:#fca5a5;border:1px solid #dc2626;
   border-radius:4px;padding:2px 8px;font-size:.7rem;font-family:'IBM Plex Mono',monospace}
 
@@ -71,8 +103,9 @@ h1,h2,h3{font-family:'IBM Plex Mono',monospace}
 
 .access-denied{background:#1a0000;border:2px solid #dc2626;border-radius:8px;
   padding:1.5rem;text-align:center;color:#fca5a5;font-family:'IBM Plex Mono',monospace;margin:1rem 0}
-
 .info-card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:12px 16px}
+.nav-section{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
+  color:#4b5563 !important;padding:10px 4px 2px;font-family:'IBM Plex Mono',monospace}
 
 @media(max-width:640px){
   [data-testid="column"]{min-width:100% !important;flex:1 1 100% !important}
@@ -88,7 +121,6 @@ init_session()
 init_db()
 init_reports_table()
 
-# ── Login gate ───────────────────────────────────────────────────
 if not st.session_state.logged_in:
     render_login()
     st.stop()
@@ -106,28 +138,63 @@ st.markdown(f"""
   <p>
     <span class="role-badge {badge_cls}">{role_icon}</span>
     &nbsp;·&nbsp; {st.session_state.username}
-    &nbsp;·&nbsp; Demo date: <strong>March 10, 2026</strong>
-    &nbsp;·&nbsp; Modules: 1 (Tracking) · 2 (Reporting)
+    &nbsp;·&nbsp; Demo: <strong>10 Mar 2026</strong>
+    &nbsp;·&nbsp; M1: Tracker &nbsp;·&nbsp; M2: Reports
   </p>
 </div>
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════
+# ZIP EXPORT
+# ══════════════════════════════════════════════════════════════════
+def _build_zip() -> bytes:
+    buf = io.BytesIO()
+    count = 0
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        if os.path.exists(ARCHIVE_DIR):
+            for fname in sorted(os.listdir(ARCHIVE_DIR)):
+                if fname.endswith(".pdf"):
+                    zf.write(os.path.join(ARCHIVE_DIR, fname), arcname=fname)
+                    count += 1
+        zf.writestr("MANIFEST.txt",
+            f"MineGuard Report Archive\nGenerated: {TODAY}\nTotal PDFs: {count}\n")
+    buf.seek(0)
+    return buf.getvalue()
+
+# ══════════════════════════════════════════════════════════════════
+# NAVIGATION DEFINITIONS
+# ══════════════════════════════════════════════════════════════════
+MANAGER_PAGES = [
+    "📊  Dashboard",
+    "📡  Monitor & Alerts",
+    "✏️   Update Milestones",
+    "➕  Add Milestone",
+    "── Module 2 ──────────",
+    "📑  Generate Report",
+    "🗂️   Report Dashboard",
+]
+OFFICER_PAGES = [
+    "✏️   Update Milestones",
+    "➕  Add Milestone",
+    "📑  Generate Report",
+]
+nav_options = MANAGER_PAGES if role == "Manager" else OFFICER_PAGES
+
+# ══════════════════════════════════════════════════════════════════
 # SIDEBAR
 # ══════════════════════════════════════════════════════════════════
 with st.sidebar:
+    # User badge
     st.markdown(f"""
-    <div style="margin-bottom:12px">
+    <div style="margin-bottom:10px">
       <span class="role-badge {badge_cls}">{role_icon}</span>
-      <div style="color:#8b949e;font-size:.8rem;margin-top:4px">
-        {st.session_state.username}
-      </div>
+      <div style="color:#8b949e;font-size:.78rem;margin-top:4px">{st.session_state.username}</div>
     </div>
     """, unsafe_allow_html=True)
 
+    # ── Project selector ─────────────────────────────────────────
     st.markdown("### 📁 Projects")
     st.markdown("---")
-
     projects_df = get_projects()
 
     if projects_df.empty:
@@ -136,21 +203,19 @@ with st.sidebar:
         st.session_state.selected_project_name = None
     else:
         opts = dict(zip(projects_df["name"], projects_df["id"]))
-        sel  = st.selectbox("Active Project", list(opts.keys()))
+        sel  = st.selectbox("Active Project", list(opts.keys()), key="sb_proj")
         st.session_state.selected_project_id   = opts[sel]
         st.session_state.selected_project_name = sel
 
+    # ── Create / delete project ───────────────────────────────────
     if role == "Manager":
-        st.markdown('<div class="section-title">New Project</div>',
-                    unsafe_allow_html=True)
+        st.markdown('<div class="section-title">New Project</div>', unsafe_allow_html=True)
         with st.form("new_proj", clear_on_submit=True):
-            p_name  = st.text_input("Project Name *", placeholder="e.g. Jharia Block-4")
-            p_loc   = st.text_input("Location",       placeholder="e.g. Dhanbad, Jharkhand")
-            p_start = st.date_input("Start Date *",   value=TODAY)
-            if st.form_submit_button("➕ Create Project", use_container_width=True):
-                errs = []
-                if not p_name.strip(): errs.append("Name required.")
-                else: errs += validate_project_start(p_start)
+            p_name  = st.text_input("Name *",   placeholder="e.g. Jharia Block-4")
+            p_loc   = st.text_input("Location", placeholder="e.g. Dhanbad, JH")
+            p_start = st.date_input("Start *",  value=TODAY)
+            if st.form_submit_button("➕ Create", use_container_width=True):
+                errs = ([] if p_name.strip() else ["Name required."]) + validate_project_start(p_start)
                 if errs:
                     for e in errs: st.error(e)
                 else:
@@ -165,8 +230,7 @@ with st.sidebar:
 
         if st.session_state.selected_project_id:
             st.markdown("---")
-            if st.button("🗑️ Delete Active Project", use_container_width=True,
-                         type="secondary"):
+            if st.button("🗑️ Delete Active Project", use_container_width=True, type="secondary"):
                 try:
                     delete_project(st.session_state.selected_project_id)
                     st.session_state.selected_project_id   = None
@@ -176,7 +240,56 @@ with st.sidebar:
                 except Exception as ex:
                     st.error(f"❌ {ex}")
     else:
-        st.caption("⚠️ Project creation requires Manager role.")
+        st.caption("⚠️ Project management requires Manager role.")
+
+    st.markdown("---")
+
+    # ── Page navigation ───────────────────────────────────────────
+    st.markdown('<p class="nav-section">Navigate</p>', unsafe_allow_html=True)
+
+    if "current_page" not in st.session_state:
+        st.session_state.current_page = nav_options[0]
+    # Guard: if role changed and saved page no longer valid, reset
+    real_pages = [p for p in nav_options if not p.startswith("──")]
+    if st.session_state.current_page not in real_pages:
+        st.session_state.current_page = real_pages[0]
+
+    selected_page = st.radio(
+        "nav",
+        nav_options,
+        index=nav_options.index(st.session_state.current_page)
+              if st.session_state.current_page in nav_options else 0,
+        key="nav_radio",
+        label_visibility="collapsed",
+    )
+    if not selected_page.startswith("──"):
+        st.session_state.current_page = selected_page
+
+    # ── ZIP Export ────────────────────────────────────────────────
+    if role == "Manager":
+        st.markdown("---")
+        st.markdown('<div class="section-title">⬇️ Export Reports</div>', unsafe_allow_html=True)
+        n_pdfs = len([f for f in os.listdir(ARCHIVE_DIR) if f.endswith(".pdf")]) \
+                 if os.path.exists(ARCHIVE_DIR) else 0
+        stats  = get_report_stats()
+        st.markdown(f"""
+        <div style="font-size:.72rem;color:#8b949e;margin-bottom:6px;
+                    font-family:'IBM Plex Mono',monospace">
+          📁 {n_pdfs} PDF(s) archived &nbsp;·&nbsp; {stats['submitted']} submitted
+        </div>
+        """, unsafe_allow_html=True)
+
+        if n_pdfs > 0:
+            st.download_button(
+                label     = f"⬇️ Download ZIP ({n_pdfs} PDFs)",
+                data      = _build_zip(),
+                file_name = f"MineGuard_Reports_{TODAY.strftime('%Y%m%d')}.zip",
+                mime      = "application/zip",
+                use_container_width=True,
+                key       = "zip_dl",
+            )
+        else:
+            st.caption("Generate at least one report to enable export.")
 
     st.markdown("---")
     if st.button("🚪 Logout", use_container_width=True):
@@ -184,43 +297,79 @@ with st.sidebar:
         st.rerun()
 
 # ══════════════════════════════════════════════════════════════════
-# MAIN CONTENT
+# REQUIRE ACTIVE PROJECT
 # ══════════════════════════════════════════════════════════════════
 pid   = st.session_state.selected_project_id
 pname = st.session_state.selected_project_name
 
 if not pid:
     st.markdown("""
-    <div style="text-align:center;padding:3rem;color:#8b949e">
-      <h2 style="color:#f0a500">👈 Select or create a project</h2>
+    <div style="text-align:center;padding:4rem 2rem;color:#8b949e">
+      <div style="font-size:3rem">⛏️</div>
+      <h2 style="color:#f0a500;margin-top:1rem">Select or create a project</h2>
       <p>Use the sidebar to get started.</p>
     </div>
     """, unsafe_allow_html=True)
     st.stop()
 
+# Fetch shared data once per render
 projects_df   = get_projects()
-start_str     = projects_df.loc[projects_df["id"] == pid, "start_date"].values
-project_start = date.fromisoformat(start_str[0]) if len(start_str) else TODAY
+start_rows    = projects_df.loc[projects_df["id"] == pid, "start_date"].values
+project_start = date.fromisoformat(start_rows[0]) if len(start_rows) else TODAY
 milestones_df = get_milestones(pid)
 
-# ── Officer: simplified 2-tab view ─────────────────────────────
-if role == "Officer":
-    officer_view.render(pid, project_start, milestones_df)
+# ══════════════════════════════════════════════════════════════════
+# PAGE ROUTING
+# ══════════════════════════════════════════════════════════════════
+page = st.session_state.current_page
 
-# ── Manager: full 6-tab view ────────────────────────────────────
+# ── Shared pages (both roles) ────────────────────────────────────
+if page == "✏️   Update Milestones":
+    st.markdown(f"## ✏️ Update Milestones — {pname}")
+    update_form.render(milestones_df, project_start)
+
+elif page == "➕  Add Milestone":
+    st.markdown(f"## ➕ Add Milestone — {pname}")
+    add_milestone.render(pid)
+
+elif page == "📑  Generate Report":
+    st.markdown(f"## 📑 Generate Report — {pname}")
+    # Auto-feed banner: live Mod 1 status shown before report form
+    if not milestones_df.empty:
+        delayed = int((milestones_df["status"] == "delayed").sum())
+        overdue = sum(
+            1 for _, r in milestones_df.iterrows()
+            if r["status"] != "complete"
+            and date.fromisoformat(str(r["target_date"])) < TODAY
+        )
+        ac = "#dc2626" if (delayed + overdue) else "#16a34a"
+        am = (f"🚨 {delayed} delayed · {overdue} overdue — Delay Report recommended"
+              if (delayed + overdue) else
+              "✅ All milestones on track — MIS Quarterly recommended")
+        st.markdown(f"""
+        <div style="background:#161b22;border:1px solid {ac};border-radius:8px;
+                    padding:8px 14px;margin-bottom:1rem;font-size:.8rem">
+          <span style="color:{ac};font-family:'IBM Plex Mono',monospace;font-weight:600">
+            AUTO-FEED FROM MODULE 1
+          </span>
+          <span style="color:#8b949e;margin-left:10px">{am}</span>
+        </div>
+        """, unsafe_allow_html=True)
+    report_form.render(active_project_id=pid)
+
+# ── Manager-only pages ───────────────────────────────────────────
+elif page == "📊  Dashboard":
+    st.markdown(f"## 📊 Compliance Dashboard — {pname}")
+    dashboard.render(pid, pname, milestones_df)
+
+elif page == "📡  Monitor & Alerts":
+    st.markdown(f"## 📡 Monitor & Alerts — {pname}")
+    monitoring.render(milestones_df)
+
+elif page == "🗂️   Report Dashboard":
+    st.markdown("## 🗂️ Report Dashboard")
+    reports_dashboard.render(active_project_id=pid)
+
+# ── Officer fallback ─────────────────────────────────────────────
 else:
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "📊 Dashboard",
-        "📡 Monitor & Alerts",
-        "✏️ Update Milestones",
-        "➕ Add Milestone",
-        "📑 Reports",           # Module 2 — entry form
-        "🗂️ Report Dashboard",  # Module 2 — submission tracking
-    ])
-
-    with tab1: dashboard.render(pid, pname, milestones_df)
-    with tab2: monitoring.render(milestones_df)
-    with tab3: update_form.render(milestones_df, project_start)
-    with tab4: add_milestone.render(pid)
-    with tab5: report_form.render(active_project_id=pid)
-    with tab6: reports_dashboard.render(active_project_id=pid)
+    officer_view.render(pid, project_start, milestones_df)

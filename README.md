@@ -1,94 +1,62 @@
-Hackathon Submission: Minetrack by IIT-BHU | Team: Cactadee | Module 1 MVP (First Commit)
-🚀 Project Overview
-MineTrack is a modular web-based platform designed to streamline regulatory compliance and reporting for coal mine development projects. It addresses pain points in manual tracking (e.g., missed deadlines for MoC approvals, forest clearances) by digitizing workflows, automating alerts, and generating reports—reducing delays by an estimated 30% based on industry benchmarks (e.g., Deloitte mining reports).
+# ⛏️ MineGuard — Integrated Compliance System
 
-This repository starts with Module 1: Digital Compliance & Deadline Monitoring System. It tracks key milestones, monitors deadlines, and sends mock alerts for upcoming/missed timelines. Future commits will integrate Module 2 (Smart Reporting) and full prototypes.
+**Modules 1 & 2 — Coal Mine Regulatory Tracker + Reporting**
+IIT-BHU Minetrack Hackathon · Jindal Steel & Power
 
-Why This Matters: Per Ministry of Coal data, 40% of mine projects face delays from compliance gaps. MineGuard's event-driven architecture ensures proactive management, tailored for Indian regs like the Mines Act 1952 and EIA notifications.
-Hackathon Context: Built for Minetrack (10-15 Mar 2026). Integrated MVP targets both modules; this commit focuses on feasibility for rapid iteration.
+---
 
-✨ Key Features (Module 1)
+## Quick Start
 
-Milestone Tracking: Add/edit 5+ regulatory steps (e.g., EIA Submission, Land NOC) with target dates and status.
-Deadline Monitoring: Real-time checks with color-coded alerts (Green: >7 days; Yellow: 3-7 days; Red: Overdue).
-Automated Notifications: Mock SMS/Email alerts (console logs for demo; Twilio-ready for prod).
-Bottleneck Identification: Flags delays with root-cause notes (e.g., "High risk: Forest backlog").
-Dashboard: Responsive timeline view (Gantt-style) for quick oversight.
-Data Persistence: SQLite for audit-ready logs; mobile-first UI via Streamlit.
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
 
-Innovation Edge: Simple rule-based predictions for delays—scalable to ML (e.g., Scikit-learn on historical MoC data).
+# 2. Seed demo database
+python init_db.py
 
-📦 Quick Start
-Prerequisites
+# 3. Launch
+streamlit run app.py
+```
 
-Python 3.9+ (tested on 3.12)
-pip (for deps)
+## Structure
 
-Installation
-
-Clone the repo:textgit clone https://github.com/[your-username]/mineguard.git
-cd mineguard
-Install dependencies (minimal—Streamlit + essentials):textpip install streamlit plotly pandas sqlite3Note: No pip installs in prod envs; all libs are standard or lightweight.
-Initialize DB (runs auto on first launch):
-Sample milestones pre-loaded (e.g., EIA: 30 days from today).
-
-Running the App
-
-Launch locally:textstreamlit run app.py
-Opens at http://localhost:8501.
-
-Demo Flow:
-Nav: "Compliance Tracker" sidebar.
-Enter milestone (e.g., Name: "Forest Clearance", Target: "2026-04-15").
-View dashboard: Timeline updates; alerts fire on refresh (simulate cron).
-Test delay: Set past date → Red flag + mock alert.
-
-Pro Tip: For video demo (Loom), record: Input → Save → Rerun (alert) → Dashboard. Keeps it <2 mins—judges love concise proofs.
-🧪 Usage Examples
-
-Add Milestone: Form → Submit → Auto-status: "Pending".
-Check Deadlines: Button triggers scan; outputs: "Alert: Land NOC overdue by 5 days. Notify: manager@jsl.com".
-Edge Case: Invalid date? Graceful error: "Target must be future date."
-
-Sample Output (Console Alert):
-text🚨 Delay Detected: EIA Submission (Due: 2026-03-20)
-Bottleneck: Possible MoEFCC backlog.
-Mock SMS: "Action needed: Submit docs ASAP. Reply STOP to opt-out."
-
-📁 Project Structure (First Commit)
-
-minetrack/
-├── app.py                      # Streamlit entry point, sidebar, global CSS & routing
-├── requirements.txt            # Only 2 deps: streamlit + pandas
-├── README.md                   # You're reading it!
+```
+mineguard/
+├── app.py                    ← Entry point (streamlit run app.py)
+├── init_db.py                ← DB seed script (run once)
+├── requirements.txt
+│
+├── auth/                     ← Login + role guards
+├── components/               ← One file per page/view
+│   ├── dashboard.py          ← M1: KPI + timeline
+│   ├── monitoring.py         ← M1: Gantt + alerts
+│   ├── update_form.py        ← M1: edit milestone
+│   ├── add_milestone.py      ← M1: custom milestone
+│   ├── officer_view.py       ← M1: officer entry wrapper
+│   ├── report_form.py        ← M2: generate PDF report
+│   └── reports_dashboard.py  ← M2: submission tracking
 │
 ├── db/
-│   ├── __init__.py             # Re-exports all DB functions for clean imports
-│   └── database.py            # SQLite schema, CRUD ops, ER diagram in docstring
+│   ├── database.py           ← M1 CRUD (projects, milestones)
+│   └── reports_db.py         ← M2 CRUD (reports table)
 │
-├── components/
-│   ├── __init__.py             # Package init, imports all 3 components
-│   ├── dashboard.py           # Tab 1 — KPI metrics, progress bars, timeline view
-│   ├── update_form.py         # Tab 2 — Edit milestone status, notes, actual dates
-│   └── add_milestone.py       # Tab 3 — Custom milestone form + default reference table
+├── reports/
+│   └── pdf_generator.py      ← ReportLab MIS + Delay PDFs
+│
+├── utils/
+│   ├── constants.py          ← TODAY, DB_PATH, defaults
+│   ├── validators.py         ← date/name validation
+│   └── alerts.py             ← urgency, bottleneck, mock alerts
 │
 └── data/
-    └── coal_compliance.db     # SQLite DB, auto-created on first run
+    ├── mineguard.db          ← SQLite DB (auto-created)
+    └── reports_archive/      ← Generated PDFs (auto-created)
+```
 
-Future: module2.py, integrations/, tests/
+## Scalability — SQLite → PostgreSQL
 
-🤝 Contributing
-
-Fork & PR for team collabs.
-Branch: feat/module1-alerts.
-Commit often: git commit -m "feat: add deadline checker with mocks".
-
-License & Credits
-
-MIT License—open for forks.
-Built by [cactadee et al.].
-Inspired by MoC guidelines (coal.nic.in); no proprietary data used.
-Shoutout: xAI's Grok for prompt-engineered code snippets—saved 2 hrs!
-
-Questions? Open an issue or DM. Let's win this—focus on demo flow over perfection. 🚀
-Last Updated: March 10, 2026 | Commit: v0.1-Module1
+See `init_db.py` for full migration notes. Summary:
+1. `pip install psycopg2-binary`
+2. Replace `sqlite3.connect(DB_PATH)` with `psycopg2.connect(DSN)` in `db/database.py` + `db/reports_db.py`
+3. Remove `PRAGMA` lines
+4. Schema is ANSI SQL — no changes needed

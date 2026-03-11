@@ -1,4 +1,11 @@
+# MineGuard — Compliance System
+# Install: pip install -r requirements.txt
+
 streamlit>=1.32.0
 pandas>=2.0.0
 plotly>=5.18.0
 reportlab>=4.0.0
+
+# Optional: PostgreSQL migration
+# psycopg2-binary>=2.9.0
+# sqlalchemy>=2.0.0
