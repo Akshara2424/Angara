@@ -40,9 +40,9 @@ ARCHIVE_DIR = os.path.join(
 
 # ── Shared display constants ──────────────────────────────────────
 STATUS_META = {
-    "Drafted":   {"emoji": "🟡", "color": "#C8950C", "bg": "#FFF8E1"},
-    "Submitted": {"emoji": "🟢", "color": "#003366", "bg": "#E9EFF8"},
-    "Archived":  {"emoji": "⚫", "color": "#CDD4D9", "bg": "#F5F6F7"},
+    "Drafted":   {"emoji": "●", "color": "#C8950C", "bg": "#FFF8E1"},
+    "Submitted": {"emoji": "●", "color": "#003366", "bg": "#E9EFF8"},
+    "Archived":  {"emoji": "●", "color": "#CDD4D9", "bg": "#F5F6F7"},
 }
 TYPE_LABEL = {
     "MIS_Quarterly": "MIS Quarterly",
@@ -352,7 +352,7 @@ def _report_list(df: pd.DataFrame):
                 with open(fp, "rb") as fh:
                     pdf_data = fh.read()
                 st.download_button(
-                    label     = "⬇️ Download PDF",
+                    label     = "Download PDF",
                     data      = pdf_data,
                     file_name = os.path.basename(str(fp)),
                     mime      = "application/pdf",

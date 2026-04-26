@@ -1,7 +1,7 @@
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║  Angara — Integrated Compliance System                                       ║
-║  Ministry of Coal MIS Report Aesthetic — Light Theme                         ║
+║  Ministry of Coal MIS Report Aesthetic                                       ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
@@ -29,6 +29,17 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
+
+# Hide top-right buttons and elements
+hide_streamlit_style = """
+    <style>
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        .stDeployButton {visibility: hidden;}
+        [data-testid="stToolbar"] {visibility: hidden;}
+    </style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -73,6 +84,9 @@ st.markdown("""
 
 /* BASE */
 html,body,[class*="css"],.stApp{background-color:var(--bg-page)!important;color:var(--text)!important;font-family:"Segoe UI",Arial,sans-serif!important}
+.stAppViewContainer {padding: 0 !important; margin: 0 !important;}
+.stMainBlockContainer {padding: 0 !important; margin: 0 !important; max-width: 100% !important;}
+[data-testid="stAppViewContainer"] {padding: 0 !important;}
 h1,h2,h3{color:var(--navy)!important;font-weight:700!important}
 
 /* SIDEBAR */
@@ -118,9 +132,12 @@ h1,h2,h3{color:var(--navy)!important;font-weight:700!important}
 .section-title{color:var(--navy);font-size:0.78rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;border-bottom:2px solid var(--border-light);padding-bottom:5px;margin:1.4rem 0 0.8rem}
 .section-title::before{content:"";display:inline-block;width:4px;height:1em;background:var(--saffron);margin-right:8px;vertical-align:middle;border-radius:2px}
 
-.app-header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-header) 100%);border-bottom:4px solid var(--saffron);padding:1rem 1.5rem;margin-bottom:1.25rem;border-radius:8px;box-shadow:0 2px 8px rgba(27,58,107,0.2)}
+.app-header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-header) 100%);border-bottom:4px solid var(--saffron);padding:1.5rem 2rem;margin-bottom:1.25rem;border-radius:0;box-shadow:0 2px 8px rgba(27,58,107,0.2);display:flex;align-items:center;justify-content:space-between;gap:2rem}
+.app-header-content{flex:1}
 .app-header h1{color:#FFFFFF!important;margin:0;font-size:clamp(1.1rem,3vw,1.6rem);letter-spacing:0.02em}
 .app-header p{color:rgba(255,255,255,0.75);margin:4px 0 0;font-size:0.8rem}
+.app-header-logos{display:flex;align-items:center;gap:1.5rem}
+.app-header-logo{height:50px;width:auto;object-fit:contain}
 
 .role-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;letter-spacing:0.04em}
 .role-manager{background:var(--saffron-bg);color:var(--navy);border:1px solid var(--saffron)}
@@ -153,11 +170,15 @@ h1,h2,h3{color:var(--navy)!important;font-weight:700!important}
 .nav-section{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--navy)!important;padding:10px 4px 2px;font-weight:700}
 
 /* NAV BAR */
-.nav-bar{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-header) 100%);border-radius:8px;padding:12px 16px;margin-bottom:16px;border-bottom:3px solid var(--saffron);box-shadow:0 2px 8px rgba(27,58,107,0.2)}
+.nav-bar{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-header) 100%);padding:16px 0;margin:0;margin-bottom:0;border-bottom:3px solid var(--saffron);box-shadow:0 2px 8px rgba(27,58,107,0.2);width:100vw;margin-left:calc(-50vw + 50%)}
+.nav-bar-container{padding:0 24px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nav-bar .stButton>button{font-size:0.85rem!important;padding:8px 16px!important;height:auto!important;border-radius:5px!important}
 .nav-bar .stButton>button[kind="primary"]{background-color:var(--saffron)!important;color:var(--navy)!important;border-color:var(--saffron-bdr)!important;font-weight:700!important}
 .nav-bar .stButton>button[kind="primary"]:hover{background-color:var(--saffron-bdr)!important}
 .nav-bar .stButton>button[kind="secondary"]{background-color:rgba(255,255,255,0.12)!important;color:#FFFFFF!important;border-color:rgba(255,255,255,0.3)!important}
 .nav-bar .stButton>button[kind="secondary"]:hover{background-color:rgba(255,255,255,0.22)!important}
+.nav-spacer{flex:1;}
+.nav-user-info{color:#FFFFFF;font-size:0.75rem;font-weight:600;padding:0 12px;display:flex;align-items:center;gap:8px;white-space:nowrap;border-left:1px solid rgba(255,255,255,0.2);padding-left:12px}
 
 hr{border-color:var(--border-light)!important;margin:1rem 0!important}
 
@@ -211,43 +232,71 @@ if st.session_state.current_page not in real_pages:
 # ══════════════════════════════════════════════════════════════════
 # TOP NAVIGATION BAR
 # ══════════════════════════════════════════════════════════════════
-with st.container():
-    st.markdown('<div class="nav-bar">', unsafe_allow_html=True)
-    nav_cols = st.columns(len(nav_options) + 2, gap="small")
-    for idx, page_option in enumerate(nav_options):
-        with nav_cols[idx]:
-            is_active = st.session_state.current_page == page_option
-            btn_type  = "primary" if is_active else "secondary"
-            if st.button(page_option, key=f"nav_{idx}", use_container_width=True, type=btn_type):
-                st.session_state.current_page = page_option
-                st.rerun()
-    with nav_cols[-2]:
-        st.markdown(
-            f'<div style="padding:0.5rem;text-align:center;font-size:0.75rem;'
-            f'color:#FFFFFF;font-weight:600;">{role_icon}&nbsp;{st.session_state.username}</div>',
-            unsafe_allow_html=True,
-        )
-    with nav_cols[-1]:
-        if st.button("Exit", key="logout_btn", use_container_width=True, type="secondary"):
-            for k in list(st.session_state.keys()):
-                del st.session_state[k]
+st.markdown('<div class="nav-bar"><div class="nav-bar-container">', unsafe_allow_html=True)
+
+# Navigation buttons
+nav_cols = st.columns([0.1] * len(nav_options) + [1, 0.12, 0.1], gap="small")
+for idx, page_option in enumerate(nav_options):
+    with nav_cols[idx]:
+        is_active = st.session_state.current_page == page_option
+        btn_type  = "primary" if is_active else "secondary"
+        if st.button(page_option, key=f"nav_{idx}", use_container_width=True, type=btn_type):
+            st.session_state.current_page = page_option
             st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
+
+# Spacer
+with nav_cols[-3]:
+    st.markdown("")
+
+# User info
+with nav_cols[-2]:
+    st.markdown(
+        f'<div class="nav-user-info">{role_icon} {st.session_state.username}</div>',
+        unsafe_allow_html=True,
+    )
+
+# Exit button
+with nav_cols[-1]:
+    if st.button("Exit", key="logout_btn", use_container_width=True, type="secondary"):
+        for k in list(st.session_state.keys()):
+            del st.session_state[k]
+        st.rerun()
+
+st.markdown("</div></div>", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════
 # APP HEADER (landing page only)
 # ══════════════════════════════════════════════════════════════════
 if st.session_state.current_page == nav_options[0]:
-    st.markdown(f"""
-    <div class="app-header">
-      <h1>Angara — MineGuard Compliance</h1>
-      <p>
-        <span class="role-badge {badge_cls}">{role_icon}</span>
-        &nbsp;·&nbsp; {st.session_state.username}
-        &nbsp;·&nbsp; Ministry of Coal MIS System
-      </p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Add some padding
+    st.markdown('<div style="padding:0.5rem 0;"></div>', unsafe_allow_html=True)
+    
+    # Create header with logos
+    header_col1, header_col2, header_col3 = st.columns([0.15, 0.7, 0.15])
+    
+    with header_col1:
+        try:
+            img = st.image("assests/IIT-BHU_Logo.png", use_column_width=True, width=80)
+        except:
+            pass
+    
+    with header_col2:
+        st.markdown(f"""
+        <div style="background:linear-gradient(135deg,#1B3A6B 0%,#2C5282 100%);border-bottom:4px solid #E8A020;padding:1.5rem 2rem;border-radius:0;box-shadow:0 2px 8px rgba(27,58,107,0.2);text-align:center;">
+          <h1 style="color:#FFFFFF;margin:0;font-size:1.6rem;letter-spacing:0.02em;">Angara — Compliance System</h1>
+          <p style="color:rgba(255,255,255,0.75);margin:4px 0 0;font-size:0.8rem;">
+            <span style="background:#FEF6E4;color:#1B3A6B;padding:3px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;letter-spacing:0.04em;display:inline-block;">{role_icon}</span>
+            &nbsp;·&nbsp; {st.session_state.username}
+            &nbsp;·&nbsp; Ministry of Coal MIS System
+          </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with header_col3:
+        try:
+            img = st.image("assests/Jindal_Steel_Logo.png", use_column_width=True, width=80)
+        except:
+            pass
 
 # ══════════════════════════════════════════════════════════════════
 # ZIP EXPORT HELPER
@@ -332,9 +381,8 @@ pname = st.session_state.selected_project_name
 if not pid:
     st.markdown("""
     <div style="text-align:center;padding:4rem 2rem;">
-      <div style="font-size:3rem">⛏️</div>
-      <h2>Select or create a project</h2>
-      <p style="color:#4A5568">Use the selector above to get started.</p>
+      <h2 style="color:#1B3A6B;">Select or create a project</h2>
+      <p style="color:#4A5568;font-size:0.95rem;">Use the selector above to get started.</p>
     </div>
     """, unsafe_allow_html=True)
     st.stop()

@@ -3,13 +3,60 @@ import streamlit as st
 import pandas as pd
 from datetime import date
 from auth.guards import require_role
-from db import get_projects
+from db import get_projects, create_project
 from utils.alerts import compute_urgency
 from utils.constants import TODAY
+from utils.validators import validate_project_start
+import sqlite3
 
 def render(project_id, project_name, milestones_df):
     if not require_role("Manager"): return
-    st.markdown(f"## {project_name}")
+    
+    # Create New Project button
+    col1, col2 = st.columns([0.85, 0.15])
+    with col1:
+        st.markdown(f"## {project_name}")
+    with col2:
+        if st.button("New Project", key="dashboard_new_proj", use_container_width=True):
+            st.session_state.show_create_modal = True
+    
+    # Modal form for new project
+    if st.session_state.get("show_create_modal"):
+        st.markdown('<div style="background:#EEF2F7;border:1px solid #CBD5E0;border-radius:8px;padding:20px;margin-bottom:20px;">', unsafe_allow_html=True)
+        st.markdown('<h3 style="color:#1B3A6B;margin-top:0;">Create New Project</h3>', unsafe_allow_html=True)
+        
+        with st.form("new_project_form", clear_on_submit=True):
+            c1, c2 = st.columns(2)
+            with c1:
+                p_name = st.text_input("Project Name", placeholder="e.g. Jharia Block-4")
+                p_start = st.date_input("Start Date", value=TODAY)
+            with c2:
+                p_loc = st.text_input("Location", placeholder="e.g. Dhanbad, Jharkhand")
+            
+            form_col1, form_col2 = st.columns(2)
+            with form_col1:
+                if st.form_submit_button("Create", use_container_width=True):
+                    errs = ([] if p_name.strip() else ["Project name is required."]) + validate_project_start(p_start)
+                    if errs:
+                        for e in errs:
+                            st.error(e)
+                    else:
+                        try:
+                            create_project(p_name.strip(), p_start, p_loc.strip(), "Manager")
+                            st.success(f"Project '{p_name}' created successfully.")
+                            st.session_state.show_create_modal = False
+                            st.rerun()
+                        except sqlite3.IntegrityError:
+                            st.error("A project with that name already exists.")
+                        except Exception as ex:
+                            st.error(f"Error: {ex}")
+            with form_col2:
+                if st.form_submit_button("Cancel", use_container_width=True):
+                    st.session_state.show_create_modal = False
+                    st.rerun()
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+    
     _kpi(milestones_df)
     st.markdown('<div class="section-title">Milestone Timeline</div>', unsafe_allow_html=True)
     if milestones_df.empty:

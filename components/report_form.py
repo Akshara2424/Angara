@@ -35,9 +35,9 @@ REPORT_TYPES = {
     "Delay / Red Flag Report": "Delay_Report",
 }
 STATUS_META = {
-    "Drafted":   ("🟡", "#F57C00"),   # MoC warning orange
-    "Submitted": ("🟢", "#2E7D32"),   # MoC success green
-    "Archived":  ("⚫", "#4A5568"),   # MoC muted text
+    "Drafted":   ("●", "#F57C00"),   # MoC warning orange
+    "Submitted": ("●", "#2E7D32"),   # MoC success green
+    "Archived":  ("●", "#4A5568"),   # MoC muted text
 }
 
 
@@ -199,10 +199,10 @@ def render(active_project_id: int = None):
                             st.session_state["_rf_fname"] = fname
                             st.session_state["_rf_label"] = rpt_label
                             st.session_state["_rf_rid"]   = rid
-                            st.success(f"✅ {rpt_label} generated and saved to archive!")
+                            st.success(f"{rpt_label} generated and saved to archive!")
 
                         except Exception as ex:
-                            st.error(f"❌ {ex}")
+                            st.error(f"Error: {ex}")
                             import traceback; st.code(traceback.format_exc())
 
         # Download + mark-submitted (outside form so they persist)
@@ -240,8 +240,8 @@ def render(active_project_id: int = None):
 
         t, sub, drft = st.columns(3)
         t.metric("Total",    len(all_rpts))
-        sub.metric("✅ Submitted", int((all_rpts["status"] == "Submitted").sum()))
-        drft.metric("🟡 Drafted",  int((all_rpts["status"] == "Drafted").sum()))
+        sub.metric("Submitted", int((all_rpts["status"] == "Submitted").sum()))
+        drft.metric("Drafted",  int((all_rpts["status"] == "Drafted").sum()))
 
         st.markdown("---")
 
@@ -290,5 +290,5 @@ def render(active_project_id: int = None):
                 if new_s != row["status"]:
                     update_report_status(row["id"], new_s); st.rerun()
             with hc3:
-                if st.button("🗑️", key=f"hdel_{row['id']}"):
+                if st.button("Delete", key=f"hdel_{row['id']}", use_container_width=True):
                     delete_report(row["id"]); st.rerun()
