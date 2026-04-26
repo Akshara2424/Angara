@@ -304,7 +304,50 @@ projects_df = get_projects()
 if projects_df.empty:
     st.session_state.selected_project_id   = None
     st.session_state.selected_project_name = None
-    st.info("No projects yet. Create one to get started.")
+    
+    # Center the button when no projects exist
+    st.markdown("")
+    col_left, col_center, col_right = st.columns([1, 1, 1])
+    with col_center:
+        if st.button("Create Your First Project", key="create_first_proj", use_container_width=True, type="primary"):
+            st.session_state.show_create_modal = True
+    st.markdown("")
+    
+    # Show modal form for creating first project
+    if st.session_state.get("show_create_modal"):
+        st.markdown('<div style="background:#EEF2F7;border:2px solid #1B3A6B;border-radius:8px;padding:24px;margin:20px 0;">', unsafe_allow_html=True)
+        st.markdown('<h3 style="color:#1B3A6B;margin-top:0;">Create New Project</h3>', unsafe_allow_html=True)
+        
+        with st.form("create_first_project_form", clear_on_submit=True):
+            c1, c2 = st.columns(2)
+            with c1:
+                p_name = st.text_input("Project Name", placeholder="e.g. Jharia Block-4")
+                p_start = st.date_input("Start Date", value=TODAY)
+            with c2:
+                p_loc = st.text_input("Location", placeholder="e.g. Dhanbad, Jharkhand")
+            
+            form_col1, form_col2 = st.columns(2)
+            with form_col1:
+                if st.form_submit_button("Create Project", use_container_width=True, type="primary"):
+                    errs = ([] if p_name.strip() else ["Project name is required."]) + validate_project_start(p_start)
+                    if errs:
+                        for e in errs:
+                            st.error(e)
+                    else:
+                        try:
+                            create_project(p_name.strip(), p_start, p_loc.strip(), role)
+                            st.success(f"Project '{p_name}' created successfully.")
+                            st.session_state.show_create_modal = False
+                            st.rerun()
+                        except Exception as ex:
+                            st.error(f"Error: {ex}")
+            with form_col2:
+                if st.form_submit_button("Cancel", use_container_width=True):
+                    st.session_state.show_create_modal = False
+                    st.rerun()
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+    
     st.stop()
 else:
     proj_col1, proj_col2, proj_col3 = st.columns([3, 1, 1])
