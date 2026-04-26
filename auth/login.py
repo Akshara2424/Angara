@@ -19,8 +19,8 @@ def init_session():
 
 def render_login():
     st.markdown('''<div style="background:linear-gradient(135deg,#1B3A6B 0%,#2C5282 100%);border-bottom:4px solid #E8A020;padding:1.5rem 2rem;border-radius:0;box-shadow:0 2px 8px rgba(27,58,107,0.2);margin-bottom:1.25rem;">
-      <h1 style="color:#FFFFFF;margin:0;font-size:1.6rem;letter-spacing:0.02em;">Angara</h1>
-      <p style="color:rgba(255,255,255,0.75);margin:4px 0 0;font-size:0.8rem;">Regulatory Milestone Tracker · Demo: March 10, 2026</p>
+      <h1 style="color:#FFFFFF;margin:0;font-size:2rem;letter-spacing:0.02em;padding:0!important;font-weight:700;">Angara</h1>
+      <p style="color:rgba(255,255,255,0.75);margin:4px 0 0;font-size:0.8rem;padding:0!important;">Regulatory Milestone Tracker · Demo: March 10, 2026</p>
     </div>''', unsafe_allow_html=True)
     
     # Add logos around the header
