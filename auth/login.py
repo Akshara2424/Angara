@@ -22,6 +22,22 @@ def render_login():
       <h1>Angara</h1>
       <p>Regulatory Milestone Tracker · Demo: March 10, 2026</p>
     </div>''', unsafe_allow_html=True)
+    
+    # Add logos around the header
+    logo_col1, logo_col2, logo_col3 = st.columns([0.15, 0.7, 0.15])
+    with logo_col1:
+        try:
+            st.image("assests/IIT-BHU_Logo.png", width=80)
+        except:
+            pass
+    with logo_col2:
+        st.markdown("")
+    with logo_col3:
+        try:
+            st.image("assests/Jindal_Steel_Logo.png", width=80)
+        except:
+            pass
+    
     st.markdown("### Select Role to Continue")
     st.markdown("In production this would be JWT auth. For demo, choose your role below.")
     col1, col2, col3 = st.columns([1, 1, 2])
