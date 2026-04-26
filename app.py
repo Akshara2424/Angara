@@ -234,8 +234,8 @@ if st.session_state.current_page not in real_pages:
 # ══════════════════════════════════════════════════════════════════
 st.markdown('<div class="nav-bar"><div class="nav-bar-container">', unsafe_allow_html=True)
 
-# Navigation buttons
-nav_cols = st.columns([0.1] * len(nav_options) + [1, 0.12, 0.1], gap="small")
+# Navigation buttons - equal width for all nav items
+nav_cols = st.columns([1] * len(nav_options) + [0.5, 1.2, 0.5], gap="small")
 for idx, page_option in enumerate(nav_options):
     with nav_cols[idx]:
         is_active = st.session_state.current_page == page_option
