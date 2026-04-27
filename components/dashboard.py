@@ -28,16 +28,14 @@ def render(project_id, project_name, milestones_df):
     if not require_role("Manager"): return
     
     # ══════════════════════════════════════════════════════════════════
-    # DHANBAD MINES HERO SECTION
+    # DHANBAD MINES HERO SECTION - ONLY SHOW IF NO PROJECT
     # ══════════════════════════════════════════════════════════════════
-    st.markdown("""
-    <div style="border: 2px solid #1B3A6B; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-    """, unsafe_allow_html=True)
-    
-    col_left_spacer, col_hero, col_right_spacer = st.columns([0.05, 0.9, 0.05])
-    
-    with col_hero:
-        col_create, col_image = st.columns([1, 1], gap="large")
+    if not project_id:
+        st.markdown("""
+        <div style="border: 2px solid #1B3A6B; border-radius: 12px; padding: 30px; margin-bottom: 30px;">
+        """, unsafe_allow_html=True)
+        
+        col_create, col_image, col_caption = st.columns([1, 1.2, 0.1])
         
         # LEFT COLUMN - CREATE PROJECT BUTTON
         with col_create:
@@ -85,16 +83,13 @@ def render(project_id, project_name, milestones_df):
                 
                 st.markdown('</div>', unsafe_allow_html=True)
         
-        # RIGHT COLUMN - DHANBAD MINES IMAGE
+        # MIDDLE COLUMN - DHANBAD MINES IMAGE
         with col_image:
             dhanbad_img = get_image_base64("assests/dhanbad-mines.png")
             if dhanbad_img:
                 st.markdown(f"""
-                <div style="position: relative; height: 320px; display: flex; align-items: center; justify-content: center;">
+                <div style="height: 320px; display: flex; align-items: center; justify-content: center;">
                     <img src="{dhanbad_img}" alt="Dhanbad Mines" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(27,58,107,0.15);">
-                    <div style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%) rotate(90deg); color: #BDC3C7; font-size: 0.85rem; font-weight: 500; white-space: nowrap; text-transform: uppercase; letter-spacing: 2px;">
-                        Dhanbad Mines (Coal Mines in Dhanbad Jharkhand)
-                    </div>
                 </div>
                 """, unsafe_allow_html=True)
             else:
@@ -103,22 +98,32 @@ def render(project_id, project_name, milestones_df):
                     Dhanbad Mines Image
                 </div>
                 """, unsafe_allow_html=True)
-    
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown('<div style="margin-bottom: 2rem;"></div>', unsafe_allow_html=True)
+        
+        # RIGHT COLUMN - ROTATED CAPTION
+        with col_caption:
+            st.markdown("""
+            <div style="height: 320px; display: flex; align-items: center; justify-content: flex-end; padding: 0 10px;">
+                <div style="writing-mode: vertical-rl; transform: rotate(180deg); color: #A0AEC0; font-size: 0.7rem; font-weight: 500; white-space: nowrap; letter-spacing: 0.5px; text-transform: uppercase;">
+                    Dhanbad Mines • Coal Mines in Dhanbad Jharkhand
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown('<div style="margin-bottom: 2rem;"></div>', unsafe_allow_html=True)
     
     # ══════════════════════════════════════════════════════════════════
-    # ORIGINAL DASHBOARD CONTENT
+    # DASHBOARD CONTENT
     # ══════════════════════════════════════════════════════════════════
     col1, col2 = st.columns([0.85, 0.15])
     with col1:
         st.markdown(f"## {project_name}")
     with col2:
         if st.button("New Project", key="dashboard_new_proj", use_container_width=True):
-            st.session_state.show_create_modal = True
+            st.session_state.show_create_modal_main = True
     
     # Modal form for new project
-    if st.session_state.get("show_create_modal"):
+    if st.session_state.get("show_create_modal_main"):
         st.markdown('<div style="background:#EEF2F7;border:1px solid #CBD5E0;border-radius:8px;padding:20px;margin-bottom:20px;">', unsafe_allow_html=True)
         st.markdown('<h3 style="color:#1B3A6B;margin-top:0;">Create New Project</h3>', unsafe_allow_html=True)
         
@@ -141,7 +146,7 @@ def render(project_id, project_name, milestones_df):
                         try:
                             create_project(p_name.strip(), p_start, p_loc.strip(), "Manager")
                             st.success(f"Project '{p_name}' created successfully.")
-                            st.session_state.show_create_modal = False
+                            st.session_state.show_create_modal_main = False
                             st.rerun()
                         except sqlite3.IntegrityError:
                             st.error("A project with that name already exists.")
@@ -149,7 +154,7 @@ def render(project_id, project_name, milestones_df):
                             st.error(f"Error: {ex}")
             with form_col2:
                 if st.form_submit_button("Cancel", use_container_width=True):
-                    st.session_state.show_create_modal = False
+                    st.session_state.show_create_modal_main = False
                     st.rerun()
         
         st.markdown('</div>', unsafe_allow_html=True)
