@@ -33,7 +33,30 @@ def render_login():
         with col1:
             username = st.text_input("Name / ID", placeholder="e.g. Rajesh Kumar", key="login_name")
         with col2:
-            role = st.selectbox("Role", ["— select —"] + ROLES, key="login_role")
+            role_col1, role_col2 = st.columns([4, 1])
+            with role_col1:
+                role = st.selectbox("Role", ["— select —"] + ROLES, key="login_role")
+            with role_col2:
+                st.markdown("<br>", unsafe_allow_html=True)
+                if st.button("?", key="show_permissions", help="View role permissions", use_container_width=True):
+                    st.session_state.show_role_perms = not st.session_state.get("show_role_perms", False)
+        
+        # Show permissions if toggled
+        if st.session_state.get("show_role_perms"):
+            st.markdown('''<div class="info-card" style="margin-top:12px;">
+              <div class="section-title">Role Permissions</div>
+              <table style="width:100%;border-collapse:collapse;font-size:0.82rem;color:#000000;">
+                <tr style="border-bottom:1px solid #D6DADC;">
+                  <th style="text-align:left;padding:6px;color:#CDD4D9;">Feature</th>
+                  <th style="text-align:center;padding:6px;">Manager [M]</th>
+                  <th style="text-align:center;padding:6px;">Officer [O]</th>
+                </tr>
+                <tr><td style="padding:6px;">Full Dashboard</td><td style="text-align:center;">[X]</td><td style="text-align:center;">[Y]</td></tr>
+                <tr><td style="padding:6px;">Monitor &amp; Alerts</td><td style="text-align:center;">[X]</td><td style="text-align:center;">[Y]</td></tr>
+                <tr><td style="padding:6px;">Update Milestones</td><td style="text-align:center;">[X]</td><td style="text-align:center;">[X]</td></tr>
+                <tr><td style="padding:6px;">Add Milestones</td><td style="text-align:center;">[X]</td><td style="text-align:center;">[X]</td></tr>
+                <tr><td style="padding:6px;">Create / Delete Projects</td><td style="text-align:center;">[X]</td><td style="text-align:center;">[Y]</td></tr>
+              </table></div>''', unsafe_allow_html=True)
         
         # Enter App button below
         if st.button("Enter App", type="primary", use_container_width=True):
@@ -46,19 +69,3 @@ def render_login():
                 st.session_state.role = role
                 st.session_state.username = username.strip()
                 st.rerun()
-    
-    st.markdown("---")
-    st.markdown('''<div class="info-card">
-      <div class="section-title">Role Permissions</div>
-      <table style="width:100%;border-collapse:collapse;font-size:0.82rem;color:#000000;">
-        <tr style="border-bottom:1px solid #D6DADC;">
-          <th style="text-align:left;padding:6px;color:#CDD4D9;">Feature</th>
-          <th style="text-align:center;padding:6px;">Manager [M]</th>
-          <th style="text-align:center;padding:6px;">Officer [O]</th>
-        </tr>
-        <tr><td style="padding:6px;">Full Dashboard</td><td style="text-align:center;">[X]</td><td style="text-align:center;">[Y]</td></tr>
-        <tr><td style="padding:6px;">Monitor &amp; Alerts</td><td style="text-align:center;">[X]</td><td style="text-align:center;">[Y]</td></tr>
-        <tr><td style="padding:6px;">Update Milestones</td><td style="text-align:center;">[X]</td><td style="text-align:center;">[X]</td></tr>
-        <tr><td style="padding:6px;">Add Milestones</td><td style="text-align:center;">[X]</td><td style="text-align:center;">[X]</td></tr>
-        <tr><td style="padding:6px;">Create / Delete Projects</td><td style="text-align:center;">[X]</td><td style="text-align:center;">[Y]</td></tr>
-      </table></div>''', unsafe_allow_html=True)
