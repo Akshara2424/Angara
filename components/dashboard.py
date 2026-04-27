@@ -1,6 +1,8 @@
 """components/dashboard.py — Tab 1: KPI metrics + timeline. Manager only."""
 import streamlit as st
 import pandas as pd
+import os
+import base64
 from datetime import date
 from auth.guards import require_role
 from db import get_projects, create_project
@@ -9,53 +11,100 @@ from utils.constants import TODAY
 from utils.validators import validate_project_start
 import sqlite3
 
+def _get_image_b64(image_path):
+    """Convert image file to base64 data URI."""
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    full_path = os.path.join(base_dir, image_path)
+    if not os.path.exists(full_path):
+        return ""
+    with open(full_path, "rb") as f:
+        data = f.read()
+    b64 = base64.b64encode(data).decode()
+    return b64
+
 def render(project_id, project_name, milestones_df):
     if not require_role("Manager"): return
     
-    # Create New Project button
-    col1, col2 = st.columns([0.85, 0.15])
-    with col1:
-        st.markdown(f"## {project_name}")
-    with col2:
-        if st.button("New Project", key="dashboard_new_proj", use_container_width=True):
-            st.session_state.show_create_modal = True
+    st.markdown(f"# {project_name}")
     
-    # Modal form for new project
-    if st.session_state.get("show_create_modal"):
-        st.markdown('<div style="background:#EEF2F7;border:1px solid #CBD5E0;border-radius:8px;padding:20px;margin-bottom:20px;">', unsafe_allow_html=True)
-        st.markdown('<h3 style="color:#1B3A6B;margin-top:0;">Create New Project</h3>', unsafe_allow_html=True)
+    # ─────────────────────────────────────────────────────────────────
+    # NEW PROJECT SECTION WITH DHANBAD IMAGE
+    # ─────────────────────────────────────────────────────────────────
+    left_filler, main_col, right_filler = st.columns([0.05, 0.9, 0.05])
+    
+    with main_col:
+        st.markdown("""
+        <div style="border: 2px solid #1B3A6B; border-radius: 12px; padding: 24px; background-color: #FFFFFF;">
+        """, unsafe_allow_html=True)
         
-        with st.form("new_project_form", clear_on_submit=True):
-            c1, c2 = st.columns(2)
-            with c1:
-                p_name = st.text_input("Project Name", placeholder="e.g. Jharia Block-4")
-                p_start = st.date_input("Start Date", value=TODAY)
-            with c2:
-                p_loc = st.text_input("Location", placeholder="e.g. Dhanbad, Jharkhand")
+        col_left, col_right = st.columns([1, 1.2])
+        
+        # LEFT COLUMN: CREATE NEW PROJECT BUTTON & FORM
+        with col_left:
+            st.markdown('<div style="padding-right: 20px;">', unsafe_allow_html=True)
             
-            form_col1, form_col2 = st.columns(2)
-            with form_col1:
-                if st.form_submit_button("Create", use_container_width=True):
-                    errs = ([] if p_name.strip() else ["Project name is required."]) + validate_project_start(p_start)
-                    if errs:
-                        for e in errs:
-                            st.error(e)
-                    else:
-                        try:
-                            create_project(p_name.strip(), p_start, p_loc.strip(), "Manager")
-                            st.success(f"Project '{p_name}' created successfully.")
+            if st.button("Create New Project", key="dashboard_new_proj", use_container_width=True):
+                st.session_state.show_create_modal = True
+            
+            # Modal form for new project
+            if st.session_state.get("show_create_modal"):
+                st.markdown('<div style="background:#EEF2F7;border:1px solid #CBD5E0;border-radius:8px;padding:20px;margin-top:20px;">', unsafe_allow_html=True)
+                st.markdown('<h3 style="color:#1B3A6B;margin-top:0;">Create New Project</h3>', unsafe_allow_html=True)
+                
+                with st.form("new_project_form", clear_on_submit=True):
+                    c1, c2 = st.columns(2)
+                    with c1:
+                        p_name = st.text_input("Project Name", placeholder="e.g. Jharia Block-4")
+                        p_start = st.date_input("Start Date", value=TODAY)
+                    with c2:
+                        p_loc = st.text_input("Location", placeholder="e.g. Dhanbad, Jharkhand")
+                    
+                    form_col1, form_col2 = st.columns(2)
+                    with form_col1:
+                        if st.form_submit_button("Create", use_container_width=True):
+                            errs = ([] if p_name.strip() else ["Project name is required."]) + validate_project_start(p_start)
+                            if errs:
+                                for e in errs:
+                                    st.error(e)
+                            else:
+                                try:
+                                    create_project(p_name.strip(), p_start, p_loc.strip(), "Manager")
+                                    st.success(f"Project '{p_name}' created successfully.")
+                                    st.session_state.show_create_modal = False
+                                    st.rerun()
+                                except sqlite3.IntegrityError:
+                                    st.error("A project with that name already exists.")
+                                except Exception as ex:
+                                    st.error(f"Error: {ex}")
+                    with form_col2:
+                        if st.form_submit_button("Cancel", use_container_width=True):
                             st.session_state.show_create_modal = False
                             st.rerun()
-                        except sqlite3.IntegrityError:
-                            st.error("A project with that name already exists.")
-                        except Exception as ex:
-                            st.error(f"Error: {ex}")
-            with form_col2:
-                if st.form_submit_button("Cancel", use_container_width=True):
-                    st.session_state.show_create_modal = False
-                    st.rerun()
+                
+                st.markdown('</div>', unsafe_allow_html=True)
+            
+            st.markdown('</div>', unsafe_allow_html=True)
+        
+        # RIGHT COLUMN: DHANBAD MINES IMAGE WITH CAPTION
+        with col_right:
+            st.markdown("""
+            <div style="position: relative; display: flex; align-items: center; justify-content: center; height: 280px;">
+                <img src="data:image/png;base64,""" + _get_image_b64("assests/Dhanbad-mines.png") + """" 
+                     alt="Dhanbad Mines" 
+                     style="height: 100%; object-fit: contain; border-radius: 12px; box-shadow: 0 4px 12px rgba(27, 58, 107, 0.15);">
+                <div style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%) rotate(-90deg); 
+                            font-size: 0.75rem; color: #A0AEC0; font-weight: 500; white-space: nowrap; 
+                            transform-origin: right center; letter-spacing: 1px;">
+                    Dhanbad Mines (Coal Mines in Dhanbad, Jharkhand)
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True)
+    
+    # ─────────────────────────────────────────────────────────────────
+    # KPI & TIMELINE
+    # ─────────────────────────────────────────────────────────────────
     
     _kpi(milestones_df)
     st.markdown('<div class="section-title">Milestone Timeline</div>', unsafe_allow_html=True)
