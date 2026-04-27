@@ -251,8 +251,7 @@ with hdr_col3:
 # ══════════════════════════════════════════════════════════════════
 # NAVIGATION BAR
 # ══════════════════════════════════════════════════════════════════
-st.markdown('<div style="margin-top: 8px; background-color: #FFFFFF; margin-left: -2rem; margin-right: -2rem; padding: 0px; display: flex; gap: 0; align-items: stretch; border-bottom: 3px solid #E2E8F0; flex-wrap: nowrap;">', unsafe_allow_html=True)
-
+st.markdown('<div style="margin-top: 0px; background-color: #FFFFFF; margin-left: -2rem; margin-right: -2rem; padding: 0px; display: flex; gap: 0; align-items: stretch; border-bottom: 3px solid #E2E8F0; flex-wrap: nowrap;">', unsafe_allow_html=True)
 nav_cols = st.columns([1] * len(nav_options))
 for idx, page_option in enumerate(nav_options):
     with nav_cols[idx]:
@@ -266,10 +265,12 @@ st.markdown('</div>', unsafe_allow_html=True)
 # ══════════════════════════════════════════════════════════════════
 # APP HEADER (dashboard & pages)
 # ══════════════════════════════════════════════════════════════════
+st.markdown('<div style="margin-bottom: 2.5rem;"></div>', unsafe_allow_html=True)
+
 st.markdown(f"""
-<div style="background:linear-gradient(135deg,#1B3A6B 0%,#2C5282 100%);border-bottom:4px solid #E8A020;padding:1.5rem 2rem;border-radius:0;box-shadow:0 2px 8px rgba(27,58,107,0.2);text-align:center;">
+<div style="background:linear-gradient(135deg,#1B3A6B 0%,#2C5282 100%);border-bottom:4px solid #E8A020;padding:1.5rem 2rem;border-radius:0;box-shadow:0 2px 8px rgba(27,58,107,0.2);text-align:center;margin-bottom:0;">
   <h1 style="color:#FFFFFF;margin:0;font-size:1.6rem;letter-spacing:0.02em;">Angara — Compliance System</h1>
-  <p style="color:rgba(255,255,255,0.75);margin:4px 0 0;font-size:0.8rem;">
+  <p style="color:#E8E8E8;margin:4px 0 0;font-size:0.8rem;">
     <span style="background:#FEF6E4;color:#1B3A6B;padding:3px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;letter-spacing:0.04em;display:inline-block;">{role_icon}</span>
     &nbsp;·&nbsp; {st.session_state.username}
     &nbsp;·&nbsp; Ministry of Coal MIS System
@@ -365,7 +366,7 @@ if projects_df.empty:
     # ══════════════════════════════════════════════════════════════════
     # DHANBAD MINES HERO SECTION - NO PROJECTS
     # ══════════════════════════════════════════════════════════════════
-    col_create, col_image, col_caption = st.columns([1, 1.2, 0.1])
+    col_create, col_image, col_caption = st.columns([0.95, 1.35, 0.15])
     
     # LEFT COLUMN - CREATE PROJECT BUTTON
     with col_create:
@@ -378,48 +379,14 @@ if projects_df.empty:
         
         if st.button("Create First Project", key="create_first_proj", use_container_width=True, type="primary"):
             st.session_state.show_create_modal = True
-        
-        # Modal form for new project
-        if st.session_state.get("show_create_modal"):
-            st.markdown('<div style="background:#EEF2F7;border:1px solid #CBD5E0;border-radius:8px;padding:20px;margin-top:20px;">', unsafe_allow_html=True)
-            st.markdown('<h4 style="color:#1B3A6B;margin-top:0;">Create New Project</h4>', unsafe_allow_html=True)
-            
-            with st.form("create_first_project_form", clear_on_submit=True):
-                p_name = st.text_input("Project Name", placeholder="e.g. Jharia Block-4")
-                p_start = st.date_input("Start Date", value=TODAY)
-                p_loc = st.text_input("Location", placeholder="e.g. Dhanbad, Jharkhand")
-                
-                form_col1, form_col2 = st.columns(2)
-                with form_col1:
-                    if st.form_submit_button("Create", use_container_width=True):
-                        errs = ([] if p_name.strip() else ["Project name is required."]) + validate_project_start(p_start)
-                        if errs:
-                            for e in errs:
-                                st.error(e)
-                        else:
-                            try:
-                                create_project(p_name.strip(), p_start, p_loc.strip(), role)
-                                st.success(f"Project '{p_name}' created successfully.")
-                                st.session_state.show_create_modal = False
-                                st.rerun()
-                            except sqlite3.IntegrityError:
-                                st.error("A project with that name already exists.")
-                            except Exception as ex:
-                                st.error(f"Error: {ex}")
-                with form_col2:
-                    if st.form_submit_button("Cancel", use_container_width=True):
-                        st.session_state.show_create_modal = False
-                        st.rerun()
-            
-            st.markdown('</div>', unsafe_allow_html=True)
     
     # MIDDLE COLUMN - DHANBAD MINES IMAGE
     with col_image:
         dhanbad_img = get_image_base64("assests/Dhanbad-mines.png")
         if dhanbad_img:
             st.markdown(f"""
-            <div style="height: 320px; display: flex; align-items: center; justify-content: center;">
-                <img src="{dhanbad_img}" alt="Dhanbad Mines" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(27,58,107,0.15);">
+            <div style="height: 320px; display: flex; align-items: center; justify-content: flex-start; padding: 0 20px 0 0;">
+                <img src="{dhanbad_img}" alt="Dhanbad Mines" style="width: 95%; height: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(27,58,107,0.15);">
             </div>
             """, unsafe_allow_html=True)
         else:
@@ -432,12 +399,47 @@ if projects_df.empty:
     # RIGHT COLUMN - ROTATED CAPTION
     with col_caption:
         st.markdown("""
-        <div style="height: 320px; display: flex; align-items: center; justify-content: flex-end; padding: 0 10px;">
-            <div style="writing-mode: vertical-rl; transform: rotate(180deg); color: #A0AEC0; font-size: 0.7rem; font-weight: 500; white-space: nowrap; letter-spacing: 0.5px; text-transform: uppercase;">
-                Dhanbad Mines • Coal Mines in Dhanbad Jharkhand
+        <div style="height: 320px; display: flex; align-items: center; justify-content: center; padding: 0 5px;">
+            <div style="writing-mode: vertical-rl; transform: rotate(180deg); color: #A0AEC0; font-size: 0.68rem; font-weight: 600; white-space: nowrap; letter-spacing: 1px; text-transform: uppercase; text-align: center; line-height: 1.2;">
+                Dhanbad<br>Mines
             </div>
         </div>
         """, unsafe_allow_html=True)
+    
+    # FORM SECTION - BELOW HERO (outside the column structure)
+    if st.session_state.get("show_create_modal"):
+        st.markdown('<div style="margin-bottom: 2rem;"></div>', unsafe_allow_html=True)
+        st.markdown('<div style="background:#EEF2F7;border:2px solid #1B3A6B;border-radius:8px;padding:24px;margin-bottom:30px;">', unsafe_allow_html=True)
+        st.markdown('<h3 style="color:#1B3A6B;margin-top:0;margin-bottom:20px;">Create New Project</h3>', unsafe_allow_html=True)
+        
+        with st.form("create_first_project_form", clear_on_submit=True):
+            p_name = st.text_input("Project Name", placeholder="e.g. Jharia Block-4")
+            p_start = st.date_input("Start Date", value=TODAY)
+            p_loc = st.text_input("Location", placeholder="e.g. Dhanbad, Jharkhand")
+            
+            form_col1, form_col2 = st.columns(2)
+            with form_col1:
+                if st.form_submit_button("Create", use_container_width=True):
+                    errs = ([] if p_name.strip() else ["Project name is required."]) + validate_project_start(p_start)
+                    if errs:
+                        for e in errs:
+                            st.error(e)
+                    else:
+                        try:
+                            create_project(p_name.strip(), p_start, p_loc.strip(), role)
+                            st.success(f"Project '{p_name}' created successfully.")
+                            st.session_state.show_create_modal = False
+                            st.rerun()
+                        except sqlite3.IntegrityError:
+                            st.error("A project with that name already exists.")
+                        except Exception as ex:
+                            st.error(f"Error: {ex}")
+            with form_col2:
+                if st.form_submit_button("Cancel", use_container_width=True):
+                    st.session_state.show_create_modal = False
+                    st.rerun()
+        
+        st.markdown('</div>', unsafe_allow_html=True)
     
 
 else:
