@@ -122,14 +122,14 @@ h1,h2,h3,p,span{padding:4px 6px!important}
 .stButton>button:hover{background-color:var(--navy-dark)!important;border-color:var(--navy-dark)!important}
 .stButton>button[kind="primary"]{background-color:var(--navy)!important;color:#FFFFFF!important;border:1px solid var(--navy)!important;font-weight:700!important}
 .stButton>button[kind="primary"]:hover{background-color:var(--navy-dark)!important;border-color:var(--navy-dark)!important}
-.stButton>button[kind="secondary"]{background-color:#FFFFFF!important;color:var(--navy)!important;border:1px solid var(--navy)!important;border-bottom:3px solid transparent!important;border-radius:4px!important;font-weight:600!important}
-.stButton>button[kind="secondary"]:hover{background-color:#F7FAFC!important;border-color:var(--navy)!important;color:var(--navy)!important}
+.stButton>button[kind="secondary"]{background-color:#FFFFFF!important;color:var(--navy)!important;border:none!important;border-bottom:3px solid transparent!important;border-radius:0!important;font-weight:600!important;padding:16px 8px!important;font-size:0.95rem!important}
+.stButton>button[kind="secondary"]:hover{background-color:transparent!important;border-color:var(--navy)!important;color:var(--navy)!important;border-bottom:3px solid #D1D5DB!important}
 
 /* NAV BAR SPECIFIC STYLES */
-[data-testid="column"] .stButton>button[kind="secondary"]{background-color:#FFFFFF!important;color:var(--navy)!important;border:1px solid var(--navy)!important;border-bottom:3px solid transparent!important}
-[data-testid="column"] .stButton>button[kind="secondary"]:hover{background-color:#F7FAFC!important}
-[data-testid="column"] .stButton>button[kind="primary"]{background-color:var(--navy)!important;color:#FFFFFF!important;border:1px solid var(--navy)!important;border-bottom:3px solid var(--saffron)!important}
-[data-testid="column"] .stButton>button[kind="primary"]:hover{background-color:var(--navy-dark)!important;border-bottom:3px solid var(--saffron)!important}
+[data-testid="column"] .stButton>button[kind="secondary"]{background-color:#FFFFFF!important;color:var(--navy)!important;border:none!important;border-bottom:3px solid transparent!important;border-radius:0!important;padding:16px 8px!important;font-size:0.95rem!important}
+[data-testid="column"] .stButton>button[kind="secondary"]:hover{background-color:transparent!important;border-bottom:3px solid #D1D5DB!important}
+[data-testid="column"] .stButton>button[kind="primary"]{background-color:#FFFFFF!important;color:#FFFFFF!important;border:none!important;border-bottom:3px solid var(--saffron)!important;border-radius:0!important;padding:16px 8px!important;font-size:0.95rem!important;background:linear-gradient(180deg,#F7FAFC 0%,#FFFFFF 100%)!important}
+[data-testid="column"] .stButton>button[kind="primary"]:hover{background:#F7FAFC!important;border-bottom:3px solid var(--saffron)!important}
 
 /* TABS */
 [data-testid="stTabs"] [data-baseweb="tab-list"]{background-color:var(--bg-alt)!important;border-bottom:2px solid var(--border)!important}
@@ -251,7 +251,7 @@ with hdr_col3:
 # ══════════════════════════════════════════════════════════════════
 # NAVIGATION BAR
 # ══════════════════════════════════════════════════════════════════
-st.markdown('<div style="margin-top: 8px; background-color: #FFFFFF; margin-left: -2rem; margin-right: -2rem; padding: 12px 0px; display: flex; gap: 0; align-items: center; border-bottom: 3px solid #E2E8F0;">', unsafe_allow_html=True)
+st.markdown('<div style="margin-top: 8px; background-color: #FFFFFF; margin-left: -2rem; margin-right: -2rem; padding: 0px; display: flex; gap: 0; align-items: stretch; border-bottom: 3px solid #E2E8F0; flex-wrap: nowrap;">', unsafe_allow_html=True)
 
 nav_cols = st.columns([1] * len(nav_options))
 for idx, page_option in enumerate(nav_options):
