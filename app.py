@@ -24,6 +24,19 @@ from utils.validators import validate_project_start
 BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
 ARCHIVE_DIR = os.path.join(BASE_DIR, "data", "reports_archive")
 
+def get_image_base64(image_path):
+    """Convert image file to base64 data URI."""
+    full_path = os.path.join(BASE_DIR, image_path)
+    if not os.path.exists(full_path):
+        return None
+    with open(full_path, "rb") as f:
+        data = f.read()
+    import base64
+    b64 = base64.b64encode(data).decode()
+    ext = image_path.split('.')[-1].lower()
+    mime = f"image/{ext}" if ext != "jpg" else "image/jpeg"
+    return f"data:{mime};base64,{b64}"
+
 st.set_page_config(
     page_title="Angara — Compliance",
     layout="wide",
@@ -305,14 +318,20 @@ def _build_zip() -> bytes:
 # ══════════════════════════════════════════════════════════════════
 def render_footer():
     """Render government-style footer with project branding."""
-    st.markdown("""
+    iit_logo = get_image_base64("assests/IIT-BHU_Logo.png")
+    jindal_logo = get_image_base64("assests/Jindal_Steel_Logo.png")
+    
+    iit_img = f'<img src="{iit_logo}" alt="IIT-BHU" style="width: 45px; height: 45px; object-fit: contain;">' if iit_logo else '<div style="width: 45px; height: 45px; background: #E8A020; border-radius: 4px;"></div>'
+    jindal_img = f'<img src="{jindal_logo}" alt="Jindal Steel" style="width: 50px; height: 40px; object-fit: contain;">' if jindal_logo else '<div style="width: 50px; height: 40px; background: #E8A020; border-radius: 4px;"></div>'
+    
+    st.markdown(f"""
     <div class="footer-container">
       <div style="max-width: 1400px; margin: 0 auto; padding: 0 20px;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 30px; margin-bottom: 20px;">
           <div style="display: flex; align-items: flex-start; gap: 15px; max-width: 350px;">
             <div style="display: flex; gap: 10px; align-items: center;">
-              <img src="assests/IIT-BHU_Logo.png" alt="IIT-BHU" style="width: 45px; height: 45px; object-fit: contain;">
-              <img src="assests/Jindal_Steel_Logo.png" alt="Jindal Steel" style="width: 50px; height: 40px; object-fit: contain;">
+              {iit_img}
+              {jindal_img}
             </div>
             <div>
               <strong style="color: #E8A020;">ANGARA</strong><br>
