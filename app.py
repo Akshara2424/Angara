@@ -251,21 +251,15 @@ with hdr_col3:
 # ══════════════════════════════════════════════════════════════════
 # NAVIGATION BAR
 # ══════════════════════════════════════════════════════════════════
-st.markdown('<div style="margin-top: 8px; background-color: #FFFFFF; margin-left: -2rem; margin-right: -2rem; padding: 12px 20px; display: flex; gap: 6px; align-items: center; border-bottom: 2px solid #E2E8F0;">', unsafe_allow_html=True)
+st.markdown('<div style="margin-top: 8px; background-color: #FFFFFF; margin-left: -2rem; margin-right: -2rem; padding: 12px 0px; display: flex; gap: 0; align-items: center; border-bottom: 3px solid #E2E8F0;">', unsafe_allow_html=True)
 
-nav_cols = st.columns([1.2] * len(nav_options) + [1])
+nav_cols = st.columns([1] * len(nav_options))
 for idx, page_option in enumerate(nav_options):
     with nav_cols[idx]:
         is_active = st.session_state.current_page == page_option
         if st.button(page_option, key=f"nav_{idx}", use_container_width=True, type=("primary" if is_active else "secondary")):
             st.session_state.current_page = page_option
             st.rerun()
-
-with nav_cols[-1]:
-    st.markdown(
-        f'<div style=\"color: var(--navy); font-size: 0.85rem; font-weight: 600; text-align: right;\">{role_icon}</div>',
-        unsafe_allow_html=True,
-    )
 
 st.markdown('</div>', unsafe_allow_html=True)
 
