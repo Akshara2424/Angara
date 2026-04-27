@@ -38,7 +38,7 @@ def get_image_base64(image_path):
     return f"data:{mime};base64,{b64}"
 
 st.set_page_config(
-    page_title="Angara — Compliance",
+    page_title="Angara",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
