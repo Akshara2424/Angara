@@ -69,3 +69,64 @@ def render_login():
                 st.session_state.role = role
                 st.session_state.username = username.strip()
                 st.rerun()
+    
+    # Footer
+    st.markdown("""
+    <footer style="background-color: #1B3A6B; color: #ffffff; padding: 30px 0; font-size: 13px; border-top: 4px solid #E8A020; margin-top: 40px;">
+      <div style="max-width: 1400px; margin: 0 auto; padding: 0 20px;">
+        
+        <!-- Top Row -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 30px; margin-bottom: 20px;">
+          
+          <!-- Left: Ministry Logos + Description -->
+          <div style="display: flex; align-items: flex-start; gap: 15px; max-width: 350px;">
+            <img src="assests/IIT-BHU_Logo.png" alt="IIT-BHU" style="width: 50px; height: 50px; object-fit: contain;">
+            <div>
+              <strong style="color: #E8A020;">ANGARA</strong><br>
+              <small style="line-height: 1.4; color: #CBD5E0;">
+                An integrated compliance tracking system for<br>
+                Ministry of Coal to monitor and report on<br>
+                regulatory milestones and project progress.
+              </small>
+            </div>
+          </div>
+
+          <!-- Center: Important Links -->
+          <div>
+            <strong style="color: #E8A020;">Important Links</strong><br>
+            <small style="color: #CBD5E0; line-height: 1.8;">
+              Dashboard &nbsp; | &nbsp; Monitor & Alerts &nbsp; | &nbsp;<br>
+              Generate Reports &nbsp; | &nbsp; Update Milestones
+            </small>
+          </div>
+
+          <!-- Center: Useful Links -->
+          <div>
+            <strong style="color: #E8A020;">Useful Links</strong><br>
+            <small style="color: #CBD5E0; line-height: 1.8;">
+              Documentation &nbsp; | &nbsp; Resources &nbsp; | &nbsp;<br>
+              Support &nbsp; | &nbsp; Feedback
+            </small>
+          </div>
+
+          <!-- Right: Partner + Powered By -->
+          <div style="text-align: right;">
+            <strong style="color: #E8A020;">Ministry Partners</strong><br>
+            <small style="color: #CBD5E0; line-height: 1.8;">
+              Ministry of Coal<br>
+              IIT (BHU) Varanasi
+            </small>
+            <div style="margin-top: 15px;">
+              <img src="assests/Jindal_Steel_Logo.png" alt="Jindal Steel" style="width: 100px; height: auto; object-fit: contain; opacity: 0.9;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div style="border-top: 1px solid #334155; padding-top: 15px; text-align: center; font-size: 12px; color: #CBD5E0;">
+          © 2026 - ANGARA @ All rights reserved | Ministry of Coal<br>
+          <small>Regulatory Milestone Tracker & Compliance Reporting System | IIT-BHU Hackathon Submission</small>
+        </div>
+      </div>
+    </footer>
+    """, unsafe_allow_html=True)
