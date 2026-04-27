@@ -122,13 +122,13 @@ h1,h2,h3,p,span{padding:4px 6px!important}
 .stButton>button:hover{background-color:var(--navy-dark)!important;border-color:var(--navy-dark)!important}
 .stButton>button[kind="primary"]{background-color:var(--navy)!important;color:#FFFFFF!important;border:1px solid var(--navy)!important;font-weight:700!important}
 .stButton>button[kind="primary"]:hover{background-color:var(--navy-dark)!important;border-color:var(--navy-dark)!important}
-.stButton>button[kind="secondary"]{background-color:#FFFFFF!important;color:var(--navy)!important;border:none!important;border-bottom:3px solid transparent!important;border-radius:0!important;font-weight:600!important;padding:16px 8px!important;font-size:0.95rem!important}
+.stButton>button[kind="secondary"]{background-color:#FFFFFF!important;color:var(--navy)!important;border:none!important;border-bottom:3px solid transparent!important;border-radius:0!important;font-weight:600!important;padding:8px 12px!important;font-size:0.9rem!important}
 .stButton>button[kind="secondary"]:hover{background-color:transparent!important;border-color:var(--navy)!important;color:var(--navy)!important;border-bottom:3px solid #D1D5DB!important}
 
 /* NAV BAR SPECIFIC STYLES */
-[data-testid="column"] .stButton>button[kind="secondary"]{background-color:#FFFFFF!important;color:var(--navy)!important;border:none!important;border-bottom:3px solid transparent!important;border-radius:0!important;padding:16px 8px!important;font-size:0.95rem!important}
+[data-testid="column"] .stButton>button[kind="secondary"]{background-color:#FFFFFF!important;color:var(--navy)!important;border:none!important;border-bottom:3px solid transparent!important;border-radius:0!important;padding:8px 12px!important;font-size:0.9rem!important}
 [data-testid="column"] .stButton>button[kind="secondary"]:hover{background-color:transparent!important;border-bottom:3px solid #D1D5DB!important}
-[data-testid="column"] .stButton>button[kind="primary"]{background-color:#FFFFFF!important;color:#FFFFFF!important;border:none!important;border-bottom:3px solid var(--saffron)!important;border-radius:0!important;padding:16px 8px!important;font-size:0.95rem!important;background:linear-gradient(180deg,#F7FAFC 0%,#FFFFFF 100%)!important}
+[data-testid="column"] .stButton>button[kind="primary"]{background-color:#FFFFFF!important;color:#FFFFFF!important;border:none!important;border-bottom:3px solid var(--saffron)!important;border-radius:0!important;padding:8px 12px!important;font-size:0.9rem!important;background:linear-gradient(180deg,#F7FAFC 0%,#FFFFFF 100%)!important}
 [data-testid="column"] .stButton>button[kind="primary"]:hover{background:#F7FAFC!important;border-bottom:3px solid var(--saffron)!important}
 
 /* TABS */
