@@ -109,6 +109,8 @@ h1,h2,h3,p,span{padding:4px 6px!important}
 .stButton>button:hover{background-color:var(--navy-dark)!important;border-color:var(--navy-dark)!important;box-shadow:0 2px 6px rgba(27,58,107,0.25)!important}
 .stButton>button[kind="secondary"]{background-color:var(--bg-alt)!important;color:var(--navy)!important;border:1px solid var(--border)!important}
 .stButton>button[kind="secondary"]:hover{background-color:#dce5f0!important;border-color:var(--navy)!important}
+/* Circular buttons for small button widths */
+.stButton button {min-width: auto !important;}
 .stDownloadButton>button{background-color:var(--navy)!important;color:#FFFFFF!important;border:1px solid var(--navy)!important;border-radius:5px!important;font-weight:600!important}
 .stDownloadButton>button:hover{background-color:var(--navy-dark)!important}
 
