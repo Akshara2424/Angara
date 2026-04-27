@@ -365,10 +365,6 @@ if projects_df.empty:
     # ══════════════════════════════════════════════════════════════════
     # DHANBAD MINES HERO SECTION - NO PROJECTS
     # ══════════════════════════════════════════════════════════════════
-    st.markdown("""
-    <div style="border: 2px solid #1B3A6B; border-radius: 12px; padding: 30px; margin-bottom: 30px;">
-    """, unsafe_allow_html=True)
-    
     col_create, col_image, col_caption = st.columns([1, 1.2, 0.1])
     
     # LEFT COLUMN - CREATE PROJECT BUTTON
@@ -443,10 +439,7 @@ if projects_df.empty:
         </div>
         """, unsafe_allow_html=True)
     
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown('<div style="margin-bottom: 2rem;"></div>', unsafe_allow_html=True)
-    
-    st.stop()
+
 else:
     proj_col1, proj_col2, proj_col3 = st.columns([3, 1, 1])
     with proj_col1:
