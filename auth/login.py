@@ -24,24 +24,28 @@ def render_login():
     except:
         st.warning("Header image not found")
     
-    # Form fields
-    col1, col2 = st.columns(2)
-    with col1:
-        username = st.text_input("Name / ID", placeholder="e.g. Rajesh Kumar", key="login_name")
-    with col2:
-        role = st.selectbox("Role", ["— select —"] + ROLES, key="login_role")
+    # Center form in 60% width
+    left_space, form_col, right_space = st.columns([1, 3, 1])
     
-    # Enter App button below
-    if st.button("Enter App", type="primary", use_container_width=True):
-        if role == "— select —":
-            st.error("Please select a role.")
-        elif not username.strip():
-            st.error("Please enter your name or ID.")
-        else:
-            st.session_state.logged_in = True
-            st.session_state.role = role
-            st.session_state.username = username.strip()
-            st.rerun()
+    with form_col:
+        # Form fields
+        col1, col2 = st.columns(2)
+        with col1:
+            username = st.text_input("Name / ID", placeholder="e.g. Rajesh Kumar", key="login_name")
+        with col2:
+            role = st.selectbox("Role", ["— select —"] + ROLES, key="login_role")
+        
+        # Enter App button below
+        if st.button("Enter App", type="primary", use_container_width=True):
+            if role == "— select —":
+                st.error("Please select a role.")
+            elif not username.strip():
+                st.error("Please enter your name or ID.")
+            else:
+                st.session_state.logged_in = True
+                st.session_state.role = role
+                st.session_state.username = username.strip()
+                st.rerun()
     
     st.markdown("---")
     st.markdown('''<div class="info-card">
