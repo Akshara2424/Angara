@@ -211,15 +211,12 @@ role_icon = "Manager" if role == "Manager" else "Officer"
 MANAGER_PAGES = [
     "Dashboard",
     "Monitor & Alerts",
-    "Update Milestones",
-    "Add Milestone",
-    "Generate Report",
-    "Report Dashboard",
+    "Milestones",
+    "Reports",
 ]
 OFFICER_PAGES = [
-    "Update Milestones",
-    "Add Milestone",
-    "Generate Report",
+    "Milestones",
+    "Reports",
 ]
 nav_options = MANAGER_PAGES if role == "Manager" else OFFICER_PAGES
 
@@ -251,12 +248,16 @@ with hdr_col3:
 # ══════════════════════════════════════════════════════════════════
 # NAVIGATION BAR
 # ══════════════════════════════════════════════════════════════════
-st.markdown('<div style="margin-top: 0px; background-color: #FFFFFF; margin-left: -2rem; margin-right: -2rem; padding: 0px; display: flex; gap: 0; align-items: stretch; border-bottom: 3px solid #E2E8F0; flex-wrap: nowrap;">', unsafe_allow_html=True)
+st.markdown('<div style="margin-top: 0px; background-color: #FFFFFF; margin-left: -2rem; margin-right: -2rem; padding: 0px; display: flex; gap: 0; align-items: stretch; border-bottom: 3px solid #E2E8F0; flex-wrap: nowrap;'>', unsafe_allow_html=True)
 nav_cols = st.columns([1] * len(nav_options))
 for idx, page_option in enumerate(nav_options):
     with nav_cols[idx]:
         is_active = st.session_state.current_page == page_option
-        if st.button(page_option, key=f"nav_{idx}", use_container_width=True, type=("primary" if is_active else "secondary")):
+        display_label = page_option
+        # show project name on Dashboard tab once a project is selected
+        if page_option == "Dashboard" and st.session_state.get("selected_project_name"):
+            display_label = f"Dashboard — {st.session_state.get('selected_project_name')}"
+        if st.button(display_label, key=f"nav_{idx}", use_container_width=True, type=("primary" if is_active else "secondary")):
             st.session_state.current_page = page_option
             st.rerun()
 
@@ -266,8 +267,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # APP HEADER (dashboard & pages)
 # ══════════════════════════════════════════════════════════════════
 st.markdown(f"""
-<div style="background:linear-gradient(135deg,#1B3A6B 0%,#2C5282 100%);border-bottom:4px solid #E8A020;padding:1.5rem 2rem;border-radius:0;box-shadow:0 2px 8px rgba(27,58,107,0.2);text-align:center;margin-top:0px;margin-bottom:2.5rem;">
-    <h1 style="color:#FFFFFF;margin:0;font-size:1.6rem;letter-spacing:0.02em;">Angara — Compliance System</h1>
+<div style="background:linear-gradient(135deg,#1B3A6B 0%,#2C5282 100%);border-bottom:4px solid #E8A020;padding:0.8rem 2rem;border-radius:0;box-shadow:0 2px 8px rgba(27,58,107,0.12);text-align:center;margin-top:0px;margin-bottom:1.2rem;">
     <p style="color:#E8E8E8;margin:4px 0 0;font-size:0.8rem;">
         <span style="background:#FEF6E4;color:#1B3A6B;padding:3px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;letter-spacing:0.04em;display:inline-block;">{role_icon}</span>
         &nbsp;·&nbsp; {st.session_state.username}
@@ -467,6 +467,9 @@ else:
                 except Exception as ex:
                     st.error(f"Error: {ex}")
 
+    # orange divider after active project row
+    st.markdown('<div style="margin-top:8px;margin-bottom:12px;"><hr style="border:0;height:6px;background:#E8A020;border-radius:3px;margin:0;"></div>', unsafe_allow_html=True)
+
 if st.session_state.get("show_new_project"):
     st.markdown("---")
     st.markdown('<div class="section-title">New Project</div>', unsafe_allow_html=True)
@@ -512,16 +515,14 @@ milestones_df = get_milestones(pid)
 # ══════════════════════════════════════════════════════════════════
 page = st.session_state.current_page
 
-if page == "Update Milestones":
-    st.markdown(f"## Update Milestones — {pname}")
+if page == "Milestones":
+    st.markdown(f"## Milestones — {pname}")
     update_form.render(milestones_df, project_start)
-
-elif page == "Add Milestone":
-    st.markdown(f"## Add Milestone — {pname}")
+    st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
     add_milestone.render(pid)
 
-elif page == "Generate Report":
-    st.markdown(f"## Generate Report — {pname}")
+elif page == "Reports":
+    st.markdown(f"## Reports — {pname}")
     if not milestones_df.empty:
         delayed = int((milestones_df["status"] == "delayed").sum())
         overdue = sum(
@@ -541,19 +542,22 @@ elif page == "Generate Report":
         </div>
         """, unsafe_allow_html=True)
     report_form.render(active_project_id=pid)
+    st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+    reports_dashboard.render(active_project_id=pid)
 
 elif page == "Dashboard":
-    st.markdown(f"# Compliance Dashboard — {pname}")
+    # show project name on dashboard area and a thicker saffron divider
+    st.markdown(f"""
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;margin-bottom:8px;">
+      <div style="font-weight:700;color:var(--navy);font-size:1.05rem;padding-left:6px;">{pname}</div>
+    </div>
+    <div style="height:8px;background:#E8A020;border-radius:4px;margin-bottom:18px;"></div>
+    """, unsafe_allow_html=True)
     dashboard.render(pid, pname, milestones_df)
 
 elif page == "Monitor & Alerts":
     st.markdown(f"## Monitor & Alerts — {pname}")
     monitoring.render(milestones_df)
-
-elif page == "Report Dashboard":
-    st.markdown("## Report Dashboard")
-    reports_dashboard.render(active_project_id=pid)
-
 
 else:
     officer_view.render(pid, project_start, milestones_df)
