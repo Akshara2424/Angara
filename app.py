@@ -98,7 +98,7 @@ st.markdown("""
 /* BASE */
 html,body,[class*="css"],.stApp{background-color:var(--bg-page)!important;color:var(--text)!important;font-family:"Segoe UI",Arial,sans-serif!important}
 .stAppViewContainer {padding: 0 !important; margin: 0 !important;}
-.stMainBlockContainer {padding: 0 !important; margin: 0 !important; max-width: 100% !important;}
+.stMainBlockContainer {padding: 0 !important; margin: 0 auto !important; max-width: 90% !important;}
 [data-testid="stAppViewContainer"] {padding: 0 !important;}
 h1,h2,h3{color:var(--navy)!important;font-weight:700!important;padding:4px 6px!important}
 h1,h2,h3,p,span{padding:4px 6px!important}
@@ -182,6 +182,11 @@ h1,h2,h3,p,span{padding:4px 6px!important}
 .footer-container{background-color:#1B3A6B;color:#ffffff;padding:30px 20px;font-size:13px;border-top:4px solid #E8A020;margin-top:40px}
 .footer-container strong{color:#E8A020}
 .footer-container small{color:#6B7280}
+.footer-links a{color:#E8A020;text-decoration:none;font-weight:700}
+.footer-links a:hover{text-decoration:underline}
+
+.content-section{margin-top:1rem;margin-bottom:1.1rem}
+.content-gap{height:1rem}
 
 
 @media(max-width:640px){[data-testid="column"]{min-width:100%!important;flex:1 1 100%!important}.stDataFrame{font-size:12px}}
@@ -221,8 +226,19 @@ OFFICER_PAGES = [
 ]
 nav_options = MANAGER_PAGES if role == "Manager" else OFFICER_PAGES
 
+requested_page = None
+if hasattr(st, "query_params"):
+    requested_page = st.query_params.get("page")
+    if isinstance(requested_page, list):
+        requested_page = requested_page[0] if requested_page else None
+else:
+    requested_page = st.experimental_get_query_params().get("page", [None])[0]
+
 if "current_page" not in st.session_state:
     st.session_state.current_page = nav_options[0]
+
+if requested_page in nav_options:
+    st.session_state.current_page = requested_page
 
 real_pages = [p for p in nav_options if not p.startswith("──")]
 if st.session_state.current_page not in real_pages:
@@ -294,6 +310,20 @@ def render_footer():
     """Render government-style footer with project branding."""
     iit_logo = get_image_base64("assests/IIT-BHU_Logo.png")
     jindal_logo = get_image_base64("assests/Jindal_Steel_Logo.png")
+
+    important_links = []
+    if role == "Manager":
+        important_links = [
+            ("Dashboard", "Dashboard"),
+            ("Monitor & Alerts", "Monitor%20%26%20Alerts"),
+            ("Reports", "Reports"),
+            ("Milestones", "Milestones"),
+        ]
+    else:
+        important_links = [
+            ("Milestones", "Milestones"),
+            ("Reports", "Reports"),
+        ]
     
     iit_img = f'<img src="{iit_logo}" alt="IIT-BHU" style="width: 45px; height: 45px; object-fit: contain;">' if iit_logo else '<div style="width: 45px; height: 45px; background: #E8A020; border-radius: 4px;"></div>'
     jindal_img = f'<img src="{jindal_logo}" alt="Jindal Steel" style="width: 50px; height: 40px; object-fit: contain;">' if jindal_logo else '<div style="width: 50px; height: 40px; background: #E8A020; border-radius: 4px;"></div>'
@@ -318,27 +348,26 @@ def render_footer():
           </div>
           <div>
             <strong style="color: #E8A020;">Important Links</strong><br>
-            <small style="color: #CBD5E0; line-height: 1.8;">
-              Dashboard &nbsp; | &nbsp; Monitor & Alerts &nbsp; | &nbsp;<br>
-              Generate Reports &nbsp; | &nbsp; Update Milestones
-            </small>
+                        <small class="footer-links" style="color: #6B7280; line-height: 1.8;">
+                            {''.join([f'<a href="?page={target}">{label}</a>' + (' &nbsp; | &nbsp; ' if i < len(important_links) - 1 else '') for i, (label, target) in enumerate(important_links)])}
+                        </small>
           </div>
           <div>
             <strong style="color: #E8A020;">Useful Links</strong><br>
-            <small style="color: #CBD5E0; line-height: 1.8;">
+                        <small style="color: #6B7280; line-height: 1.8;">
               Documentation &nbsp; | &nbsp; Resources &nbsp; | &nbsp;<br>
               Support &nbsp; | &nbsp; Feedback
             </small>
           </div>
           <div style="text-align: right;">
             <strong style="color: #E8A020;">Ministry Partners</strong><br>
-            <small style="color: #CBD5E0; line-height: 1.8;">
+                        <small style="color: #6B7280; line-height: 1.8;">
               Ministry of Coal<br>
               IIT (BHU) Varanasi
             </small>
           </div>
         </div>
-        <div style="border-top: 1px solid #334155; padding-top: 15px; text-align: center; font-size: 12px; color: #CBD5E0;">
+                <div style="border-top: 1px solid #334155; padding-top: 15px; text-align: center; font-size: 12px; color: #6B7280;">
           © 2026 - ANGARA @ All rights reserved | Ministry of Coal | Team Cupcakes<br>
           <small>Regulatory Milestone Tracker & Compliance Reporting System | IIT-BHU Hackathon Submission</small>
         </div>
@@ -358,7 +387,7 @@ if projects_df.empty:
     # ══════════════════════════════════════════════════════════════════
     # DHANBAD MINES HERO SECTION - NO PROJECTS
     # ══════════════════════════════════════════════════════════════════
-    st.markdown('<div style="margin-top: 2rem;"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="content-gap"></div>', unsafe_allow_html=True)
     col_left_filler, col_create, col_image, col_caption, col_right_filler = st.columns([0.05, 0.95, 1.35, 0.15, 0.05])
     
     # LEFT FILLER
@@ -444,6 +473,7 @@ if projects_df.empty:
     
 
 else:
+    st.markdown('<div class="content-gap"></div>', unsafe_allow_html=True)
     proj_col1, proj_col2, proj_col3 = st.columns([3, 1, 1])
     with proj_col1:
         opts = dict(zip(projects_df["name"], projects_df["id"]))
@@ -466,7 +496,7 @@ else:
                     st.error(f"Error: {ex}")
 
 if st.session_state.get("show_new_project"):
-    st.markdown("---")
+    st.markdown('<div class="content-section"></div>', unsafe_allow_html=True)
     st.markdown('<div class="section-title">New Project</div>', unsafe_allow_html=True)
     with st.form("new_proj", clear_on_submit=True):
         c1, c2 = st.columns(2)
@@ -511,12 +541,14 @@ milestones_df = get_milestones(pid)
 page = st.session_state.current_page
 
 if page == "Milestones":
+    st.markdown('<div class="content-gap"></div>', unsafe_allow_html=True)
     st.markdown(f"## Milestones — {pname}")
     update_form.render(milestones_df, project_start)
-    st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+    st.markdown('<div class="content-gap"></div>', unsafe_allow_html=True)
     add_milestone.render(pid)
 
 elif page == "Reports":
+    st.markdown('<div class="content-gap"></div>', unsafe_allow_html=True)
     st.markdown(f"## Reports — {pname}")
     if not milestones_df.empty:
         delayed = int((milestones_df["status"] == "delayed").sum())
@@ -537,14 +569,16 @@ elif page == "Reports":
         </div>
         """, unsafe_allow_html=True)
     report_form.render(active_project_id=pid)
-    st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+    st.markdown('<div class="content-gap"></div>', unsafe_allow_html=True)
     reports_dashboard.render(active_project_id=pid)
 
 elif page == "Dashboard":
+    st.markdown('<div class="content-gap"></div>', unsafe_allow_html=True)
     st.markdown("## Dashboard")
     dashboard.render(pid, pname, milestones_df)
 
 elif page == "Monitor & Alerts":
+    st.markdown('<div class="content-gap"></div>', unsafe_allow_html=True)
     st.markdown(f"## Monitor & Alerts — {pname}")
     monitoring.render(milestones_df)
 
