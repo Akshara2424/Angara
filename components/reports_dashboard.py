@@ -42,7 +42,7 @@ ARCHIVE_DIR = os.path.join(
 STATUS_META = {
     "Drafted":   {"emoji": "●", "color": "#C8950C", "bg": "#FFF8E1"},
     "Submitted": {"emoji": "●", "color": "#003366", "bg": "#E9EFF8"},
-    "Archived":  {"emoji": "●", "color": "#CDD4D9", "bg": "#F5F6F7"},
+    "Archived":  {"emoji": "●", "color": "#6B7280", "bg": "#F5F6F7"},
 }
 TYPE_LABEL = {
     "MIS_Quarterly": "MIS Quarterly",
@@ -118,7 +118,7 @@ def _kpi_cards(stats: dict):
 
     st.markdown(f"""
     <div style="margin:.4rem 0 1rem">
-      <div style="font-size:.7rem;color:#CDD4D9;margin-bottom:4px;
+    <div style="font-size:.7rem;color:#4B5563;margin-bottom:4px;
                   font-family:'IBM Plex Mono',monospace;letter-spacing:.05em">
         BREAKDOWN &nbsp;·&nbsp; MIS: {stats['mis_count']}
         &nbsp;|&nbsp; Delay: {stats['delay_count']}
@@ -162,7 +162,7 @@ def _milestone_strip(project_id: int):
                           margin-top:2px;line-height:1.3">
                 {row['name'][:20]}
               </div>
-              <div style="font-size:.6rem;color:#CDD4D9;margin-top:2px;
+              <div style="font-size:.6rem;color:#4B5563;margin-top:2px;
                           font-family:'IBM Plex Mono',monospace">
                 {td.strftime('%d %b')}
               </div>
@@ -214,7 +214,7 @@ def _quick_generate_section(project_id: int):
       <div style="font-size:.82rem;font-weight:600;color:#000000">
         Generate Report from Current Milestone
       </div>
-      <div style="font-size:.74rem;color:#CDD4D9;margin-top:4px">
+    <div style="font-size:.74rem;color:#4B5563;margin-top:4px">
         Project: <strong style="color:#000000">{pname}</strong>
         &nbsp;·&nbsp; {suggestion}
       </div>
@@ -322,13 +322,13 @@ def _report_list(df: pd.DataFrame):
               <div style="font-weight:600;color:#000000;font-size:.88rem">
                 {rtype}
               </div>
-              <div style="font-size:.72rem;color:#CDD4D9;margin-top:3px;
+              <div style="font-size:.72rem;color:#4B5563;margin-top:3px;
                           font-family:'IBM Plex Mono',monospace">
                 {row['project_name']}
                 &nbsp;·&nbsp; {row['quarter']}
                 &nbsp;·&nbsp; {row['submission_date']}
               </div>
-              <div style="font-size:.68rem;color:#CDD4D9;margin-top:2px">
+              <div style="font-size:.68rem;color:#4B5563;margin-top:2px">
                 By {row['submitted_by']}
                 &nbsp;·&nbsp; Generated {str(row['created_at'])[:16]}
                 {'&nbsp;·&nbsp; local archive' if file_ok else ''}
@@ -421,7 +421,7 @@ def render(active_project_id: int = None):
       <span style="color:#003366;font-family:'IBM Plex Mono',monospace;font-size:.8rem">
         REPORTS DASHBOARD — MODULE 2
       </span>
-      <span style="color:#CDD4D9;font-size:.74rem;margin-left:1rem">
+    <span style="color:#4B5563;font-size:.74rem;margin-left:1rem">
         Submission tracking · Auto-archive · Module 1 integration
       </span>
     </div>
@@ -467,7 +467,7 @@ def render(active_project_id: int = None):
     st.markdown(f"""
     <div style="background:#E9EFF8;border:1px solid #D6DADC;border-radius:8px;
                 padding:8px 14px">
-      <span style="font-size:.72rem;color:#CDD4D9;font-family:'IBM Plex Mono',monospace">
+    <span style="font-size:.72rem;color:#4B5563;font-family:'IBM Plex Mono',monospace">
         Archive folder: <code style="color:#C8950C">{ARCHIVE_DIR}</code>
         &nbsp;·&nbsp; {n_files} PDF(s) stored locally
       </span>

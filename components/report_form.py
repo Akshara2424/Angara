@@ -37,7 +37,7 @@ REPORT_TYPES = {
 STATUS_META = {
     "Drafted":   ("●", "#F57C00"),   # MoC warning orange
     "Submitted": ("●", "#2E7D32"),   # MoC success green
-    "Archived":  ("●", "#4A5568"),   # MoC muted text
+    "Archived":  ("●", "#6B7280"),   # MoC muted text
 }
 
 
@@ -52,7 +52,7 @@ def _archive_pdf(pdf_bytes: bytes, filename: str, report_id: int) -> str:
 
 def _preview(milestones_df: pd.DataFrame):
     st.markdown(
-        '<div class="section-title">Data Preview — Live from Module 1 DB</div>',
+        '<div class="section-title" style="text-align:center;">Data Preview — Live from Module 1 DB</div>',
         unsafe_allow_html=True,
     )
     if milestones_df.empty:
@@ -85,9 +85,9 @@ def render(active_project_id: int = None):
     init_reports_table()
 
     st.markdown("""
-    <div class="module-banner">
-      <span class="banner-tag" MODULE 2 — SMART REPORTING</span>
-      <span class="banner-sub">Single-point entry · Pulls Module 1 DB · Auto-archived on generate</span>
+    <div class="module-banner" style="text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <span class="banner-tag">MODULE 2 — SMART REPORTING</span>
+        <span class="banner-sub">Single-point entry · Pulls Module 1 DB · Auto-archived on generate</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -128,8 +128,8 @@ def render(active_project_id: int = None):
         st.markdown("---")
 
         # Config form
-        st.markdown('<div class="section-title">2. Report Configuration</div>',
-                    unsafe_allow_html=True)
+        st.markdown('<div class="section-title" style="text-align:center;">2. Report Configuration</div>',
+                unsafe_allow_html=True)
 
         with st.form("rf_gen", clear_on_submit=False):
             ca, cb = st.columns(2)
@@ -208,7 +208,7 @@ def render(active_project_id: int = None):
         # Download + mark-submitted (outside form so they persist)
         if st.session_state.get("_rf_pdf"):
             st.markdown("---")
-            dl_col, mark_col = st.columns([2, 1])
+            dl_col, mark_col = st.columns([1, 1], gap="large")
             with dl_col:
                 st.download_button(
                     label     = f"⬇Download {st.session_state['_rf_label']}",
@@ -230,8 +230,8 @@ def render(active_project_id: int = None):
     # TAB 2 — HISTORY
     # ════════════════════════════════════════
     with hist_tab:
-        st.markdown('<div class="section-title">Generated Reports Archive</div>',
-                    unsafe_allow_html=True)
+        st.markdown('<div class="section-title" style="text-align:center;">Generated Reports Archive</div>',
+                unsafe_allow_html=True)
 
         all_rpts = get_reports()
         if all_rpts.empty:
@@ -255,7 +255,7 @@ def render(active_project_id: int = None):
               <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;align-items:center">
                 <div>
                   <span class="report-card-title">{emoji} {row['report_type'].replace('_',' ')}</span>
-                  <span style="font-size:.73rem;color:#4A5568;margin-left:8px">
+                  <span style="font-size:.73rem;color:#4B5563;margin-left:8px">
                     {row['project_name']} · {row['submission_date']}
                   </span>
                 </div>

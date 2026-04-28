@@ -132,8 +132,8 @@ h1,h2,h3,p,span{padding:4px 6px!important}
 [data-testid="column"] .stButton>button[kind="primary"]:hover{background:#F7FAFC!important;border-bottom:3px solid var(--saffron)!important}
 
 /* TABS */
-[data-testid="stTabs"] [data-baseweb="tab-list"]{background-color:var(--bg-alt)!important;border-bottom:2px solid var(--border)!important}
-[data-testid="stTabs"] [data-baseweb="tab"]{color:var(--text-muted)!important;font-weight:600!important;padding:10px 18px!important}
+[data-testid="stTabs"] [data-baseweb="tab-list"]{background-color:var(--bg-alt)!important;border-bottom:2px solid var(--border)!important;justify-content:center!important;display:flex!important}
+[data-testid="stTabs"] [data-baseweb="tab"]{color:var(--text-muted)!important;font-weight:600!important;padding:10px 18px!important;justify-content:center!important;text-align:center!important}
 [data-testid="stTabs"] [data-baseweb="tab"][aria-selected="true"]{color:var(--navy)!important;border-bottom:3px solid var(--navy)!important;background-color:var(--bg-page)!important}
 
 /* DATA TABLES — #2C5282 header with white text */

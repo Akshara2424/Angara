@@ -89,16 +89,16 @@ def render(project_id, project_name, milestones_df):
         info = compute_urgency(td, row["status"])
         is_over = (td < TODAY and row["status"] != "complete")
         overdue_tag = f'<span class="overdue-chip"> OVERDUE {(TODAY-td).days}d</span>' if is_over else ""
-        fill = "#003366" if row["status"]=="complete" else "#C8950C" if row["status"]=="in_progress" else "#BF382A" if (is_over or row["status"]=="delayed") else "#CDD4D9"
-        notes_html = f'<div style="font-size:0.73rem;color:#CDD4D9;margin-top:4px;">[Notes] {row["notes"]}</div>' if row["notes"] else ""
-        by_html = f'<span style="font-size:0.7rem;color:#CDD4D9;margin-left:8px;">by {row["submitted_by"]}</span>' if row.get("submitted_by") else ""
+        fill = "#003366" if row["status"]=="complete" else "#C8950C" if row["status"]=="in_progress" else "#BF382A" if (is_over or row["status"]=="delayed") else "#4B5563"
+        notes_html = f'<div style="font-size:0.73rem;color:#4B5563;margin-top:4px;">[Notes] {row["notes"]}</div>' if row["notes"] else ""
+        by_html = f'<span style="font-size:0.7rem;color:#4B5563;margin-left:8px;">by {row["submitted_by"]}</span>' if row.get("submitted_by") else ""
         st.markdown(f"""
         <div style="background:#E9EFF8;border:1px solid #D6DADC;border-left:4px solid {info['color']};border-radius:8px;padding:12px 16px;margin-bottom:8px;">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
             <div><span style="font-weight:600;color:#000000;">{row['name']}</span>{by_html}&nbsp;{overdue_tag}</div>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
               <span class="badge badge-{row['status']}">{row['status'].upper()}</span>
-              <span style="font-size:0.78rem;color:#CDD4D9;font-family:'IBM Plex Mono',monospace;">{td.strftime('%d %b %Y')}</span>
+              <span style="font-size:0.78rem;color:#4B5563;font-family:'IBM Plex Mono',monospace;">{td.strftime('%d %b %Y')}</span>
             </div>
           </div>
           <div class="timeline-bar" style="margin-top:8px;"><div class="timeline-fill" style="width:{bar_pct}%;background:{fill};"></div></div>
@@ -120,6 +120,6 @@ def _kpi(milestones_df):
     c3.metric("Delayed",delayed); c4.metric("Overdue",overdue)
     bar_color = "#003366" if pct==100 else ("#C8950C" if pct>=50 else "#BF382A")
     st.markdown(f'''<div style="margin:0.5rem 0 1.5rem;">
-      <div style="font-size:0.75rem;color:#CDD4D9;margin-bottom:4px;">Overall Progress — {pct}%</div>
+    <div style="font-size:0.75rem;color:#4B5563;margin-bottom:4px;">Overall Progress — {pct}%</div>
       <div class="timeline-bar"><div class="timeline-fill" style="width:{pct}%;background:{bar_color};"></div></div>
     </div>''', unsafe_allow_html=True)

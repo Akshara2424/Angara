@@ -11,12 +11,13 @@ from utils.constants import TODAY
 
 def render(milestones_df):
     if not require_role("Manager"): return
-    st.markdown('''<div style="background:#E9EFF8;border:1px solid #003366;border-radius:8px;padding:10px 16px;margin-bottom:1rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <span style="color:#003366;font-family:'IBM Plex Mono',monospace;font-size:0.8rem;">[Monitor] MONITORING ENGINE</span>
-      <span style="color:#CDD4D9;font-size:0.75rem;">Simulated date: <strong style="color:#000000;">March 10, 2026</strong> &nbsp;·&nbsp; [OK] >7d &nbsp;[WARN] 3–7d &nbsp;[CRIT] <3d / overdue</span>
-    </div>''', unsafe_allow_html=True)
-    cb, _ = st.columns([1, 3])
-    with cb: run_check = st.button("Run Deadline Check", type="primary", use_container_width=True)
+        st.markdown('''<div style="background:#E9EFF8;border:1px solid #003366;border-radius:8px;padding:10px 16px;margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center;max-width:100%;">
+            <span style="color:#003366;font-family:'IBM Plex Mono',monospace;font-size:0.8rem;">[Monitor] MONITORING ENGINE</span>
+            <span style="color:#4B5563;font-size:0.75rem;">Simulated date: <strong style="color:#1F2937;">March 10, 2026</strong> &nbsp;·&nbsp; [OK] &gt;7d &nbsp;[WARN] 3–7d &nbsp;[CRIT] &lt;3d / overdue</span>
+        </div>''', unsafe_allow_html=True)
+        _, cb, _ = st.columns([1, 1.2, 1])
+        with cb:
+                run_check = st.button("Run Deadline Check", type="primary", use_container_width=True)
     if milestones_df.empty: st.info("No milestones to monitor."); return
     milestones = []
     for _, r in milestones_df.iterrows():
@@ -34,14 +35,14 @@ def render(milestones_df):
         bn = get_bottleneck(m["name"], info["days"], m["status"])
         if bn: bottlenecks.append((m["name"], bn))
         bn_html = f'<div style="margin-top:8px;padding:6px 10px;background:#FFF8E1;border-left:3px solid #C8950C;border-radius:4px;font-size:0.75rem;color:#C8950C;">[Gear] <strong>Bottleneck:</strong> Possible cause: {bn}</div>' if bn else ""
-        notes_html = f'<div style="font-size:0.73rem;color:#CDD4D9;margin-top:4px;">[Notes] {m["notes"]}</div>' if m.get("notes") else ""
+                notes_html = f'<div style="font-size:0.73rem;color:#4B5563;margin-top:4px;">[Notes] {m["notes"]}</div>' if m.get("notes") else ""
         st.markdown(f"""
         <div style="background:#E9EFF8;border:1px solid {info['color']};border-left:4px solid {info['color']};border-radius:8px;padding:12px 16px;margin-bottom:8px;">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
             <span style="font-weight:600;color:#000000;">{info['emoji']} {m['name']}</span>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
               <span style="background:{info['color']}22;color:{info['color']};border:1px solid {info['color']};border-radius:20px;padding:2px 12px;font-size:0.75rem;font-family:'IBM Plex Mono',monospace;">{info['label']}</span>
-              <span style="font-size:0.75rem;color:#CDD4D9;font-family:'IBM Plex Mono',monospace;">{m['target_date'].strftime('%d %b %Y')}</span>
+                            <span style="font-size:0.75rem;color:#4B5563;font-family:'IBM Plex Mono',monospace;">{m['target_date'].strftime('%d %b %Y')}</span>
             </div>
           </div>{notes_html}{bn_html}
         </div>""", unsafe_allow_html=True)
@@ -62,7 +63,7 @@ def render(milestones_df):
                 all_fired.extend(fired)
                 ch_colors = {"WhatsApp":"#25d366","SMS":"#7dd3fc","Email":"#C8950C"}
             for item in all_fired:
-                cc = ch_colors.get(item["channel"],"#CDD4D9")
+                cc = ch_colors.get(item["channel"],"#4B5563")
                 st.markdown(
                              f"<div style='background:#FFFFFF;border:1px solid #D6DADC;border-left:3px solid {cc};border-radius:6px;padding:8px 12px;margin-bottom:5px;font-family:\"IBM Plex Mono\",monospace;font-size:0.73rem;color:#000000;'><span style='color:{cc};font-weight:600;'>[{item['channel']}]</span>&nbsp;{item['message']}</div>",
                              unsafe_allow_html=True)
