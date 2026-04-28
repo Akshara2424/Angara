@@ -98,7 +98,7 @@ st.markdown("""
 /* BASE */
 html,body,[class*="css"],.stApp{background-color:var(--bg-page)!important;color:var(--text)!important;font-family:"Segoe UI",Arial,sans-serif!important}
 .stAppViewContainer {padding: 0 !important; margin: 0 !important;}
-.stMainBlockContainer {padding: 0 !important; margin: 0 auto !important; max-width: 90% !important;}
+.stMainBlockContainer {padding: 0 !important; margin: 0 !important; max-width: 100% !important;}
 [data-testid="stAppViewContainer"] {padding: 0 !important;}
 h1,h2,h3{color:var(--navy)!important;font-weight:700!important;padding:4px 6px!important}
 h1,h2,h3,p,span{padding:4px 6px!important}
@@ -185,8 +185,13 @@ h1,h2,h3,p,span{padding:4px 6px!important}
 .footer-links a{color:#E8A020;text-decoration:none;font-weight:700}
 .footer-links a:hover{text-decoration:underline}
 
-.content-section{margin-top:1rem;margin-bottom:1.1rem}
-.content-gap{height:1rem}
+.shell-90{width:90%;margin:0 auto}
+.shell-90 .content-section{margin-top:1rem;margin-bottom:1.1rem}
+.shell-90 .content-gap{height:1rem}
+
+.footer-container{background-color:#1B3A6B;color:#ffffff;padding:30px 20px;font-size:13px;border-top:4px solid #E8A020;margin-top:40px;width:100vw;margin-left:calc(50% - 50vw)}
+
+
 
 
 @media(max-width:640px){[data-testid="column"]{min-width:100%!important;flex:1 1 100%!important}.stDataFrame{font-size:12px}}
@@ -378,6 +383,7 @@ def render_footer():
 # ══════════════════════════════════════════════════════════════════
 # PROJECT SELECTOR & MANAGEMENT
 # ══════════════════════════════════════════════════════════════════
+st.markdown('<div class="shell-90">', unsafe_allow_html=True)
 projects_df = get_projects()
 
 if projects_df.empty:
@@ -527,6 +533,7 @@ pid   = st.session_state.selected_project_id
 pname = st.session_state.selected_project_name
 
 if not pid:
+    st.markdown('</div>', unsafe_allow_html=True)
     render_footer()
     st.stop()
 
@@ -588,4 +595,5 @@ else:
 # ══════════════════════════════════════════════════════════════════
 # RENDER FOOTER
 # ══════════════════════════════════════════════════════════════════
+st.markdown('</div>', unsafe_allow_html=True)
 render_footer()
