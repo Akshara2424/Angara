@@ -83,8 +83,8 @@ st.markdown("""
     --border:        #CBD5E0;
     --border-light:  #E2E8F0;
     --text:          #1A1A2E;
-    --text-muted:    #4A5568;
-    --text-light:    #718096;
+    --text-muted:    #4B5563;
+    --text-light:    #6B7280;
     --success:       #2E7D32;
     --success-bg:    #E8F5E9;
     --warning:       #F57C00;
@@ -106,7 +106,7 @@ h1,h2,h3,p,span{padding:4px 6px!important}
 /* SIDEBAR */
 [data-testid="stSidebar"]{background-color:var(--navy)!important;border-right:3px solid var(--saffron)!important}
 [data-testid="stSidebar"] *{color:#FFFFFF!important}
-[data-testid="stSidebar"] p,[data-testid="stSidebar"] span,[data-testid="stSidebar"] label{color:#E2E8F0!important}
+[data-testid="stSidebar"] p,[data-testid="stSidebar"] span,[data-testid="stSidebar"] label{color:#6B7280!important}
 [data-testid="stSidebar"] h1,[data-testid="stSidebar"] h2,[data-testid="stSidebar"] h3{color:var(--saffron)!important;font-weight:700!important}
 [data-testid="stSidebar"] hr{border-color:rgba(232,160,32,0.4)!important}
 [data-testid="stSidebar"] [data-testid="stSelectbox"]>div>div{background-color:rgba(255,255,255,0.1)!important;border-color:rgba(255,255,255,0.25)!important;color:#FFFFFF!important}
@@ -181,7 +181,14 @@ h1,h2,h3,p,span{padding:4px 6px!important}
 
 .footer-container{background-color:#1B3A6B;color:#ffffff;padding:30px 20px;font-size:13px;border-top:4px solid #E8A020;margin-top:40px}
 .footer-container strong{color:#E8A020}
-.footer-container small{color:#CBD5E0}
+.footer-container small{color:#6B7280}
+
+.milestone-menu-wrap{display:inline-block;position:relative;margin:0 0 0.75rem 0}
+.milestone-menu-trigger{background:var(--navy);color:#FFFFFF;padding:0.6rem 1rem;border-radius:6px;font-weight:700;letter-spacing:0.03em;display:inline-block}
+.milestone-menu-content{display:none;position:absolute;top:100%;left:0;min-width:220px;background:#FFFFFF;border:1px solid var(--border-light);border-radius:8px;box-shadow:0 8px 24px rgba(27,58,107,0.15);z-index:50;overflow:hidden}
+.milestone-menu-wrap:hover .milestone-menu-content{display:block}
+.milestone-menu-content a{display:block;padding:0.8rem 1rem;color:var(--navy);text-decoration:none;font-weight:600;background:#FFFFFF}
+.milestone-menu-content a:hover{background:var(--bg-alt)}
 
 @media(max-width:640px){[data-testid="column"]{min-width:100%!important;flex:1 1 100%!important}.stDataFrame{font-size:12px}}
 </style>
@@ -248,15 +255,12 @@ with hdr_col3:
 # ══════════════════════════════════════════════════════════════════
 # NAVIGATION BAR
 # ══════════════════════════════════════════════════════════════════
-st.markdown('<div style="margin-top: 0px; background-color: #FFFFFF; margin-left: -2rem; margin-right: -2rem; padding: 0px; display: flex; gap: 0; align-items: stretch; border-bottom: 3px solid #E2E8F0; flex-wrap: nowrap;'>', unsafe_allow_html=True)
+st.markdown('<div style="margin-top: 0px; background-color: #FFFFFF; margin-left: -2rem; margin-right: -2rem; padding: 0px; display: flex; gap: 0; align-items: stretch; border-bottom: 3px solid #E2E8F0; flex-wrap: nowrap;"></div>', unsafe_allow_html=True)
 nav_cols = st.columns([1] * len(nav_options))
 for idx, page_option in enumerate(nav_options):
     with nav_cols[idx]:
         is_active = st.session_state.current_page == page_option
         display_label = page_option
-        # show project name on Dashboard tab once a project is selected
-        if page_option == "Dashboard" and st.session_state.get("selected_project_name"):
-            display_label = f"Dashboard — {st.session_state.get('selected_project_name')}"
         if st.button(display_label, key=f"nav_{idx}", use_container_width=True, type=("primary" if is_active else "secondary")):
             st.session_state.current_page = page_option
             st.rerun()
@@ -372,7 +376,7 @@ if projects_df.empty:
         st.markdown("""
         <div style="display: flex; flex-direction: column; justify-content: center; padding: 20px;">
             <h3 style="color: #1B3A6B; margin-bottom: 16px;">Start Your First Project</h3>
-            <p style="color: #4A5568; font-size: 0.95rem; margin-bottom: 20px;">Create and manage compliance milestones for your coal mining project.</p>
+            <p style="color: #4B5563; font-size: 0.95rem; margin-bottom: 20px;">Create and manage compliance milestones for your coal mining project.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -390,7 +394,7 @@ if projects_df.empty:
             """, unsafe_allow_html=True)
         else:
             st.markdown("""
-            <div style="height: 320px; background: linear-gradient(135deg, #EEF2F7 0%, #D6DADC 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #718096; font-size: 0.95rem;">
+            <div style="height: 320px; background: linear-gradient(135deg, #EEF2F7 0%, #D6DADC 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #4B5563; font-size: 0.95rem;">
                 Dhanbad Mines Image
             </div>
             """, unsafe_allow_html=True)
@@ -399,7 +403,7 @@ if projects_df.empty:
     with col_caption:
         st.markdown("""
         <div style="height: 320px; display: flex; align-items: center; justify-content: center; padding: 0 5px;">
-            <div style="writing-mode: vertical-rl; transform: rotate(180deg); color: #A0AEC0; font-size: 0.68rem; font-weight: 600; white-space: nowrap; letter-spacing: 1px; text-transform: uppercase; text-align: center; line-height: 1.2;">
+            <div style="writing-mode: vertical-rl; transform: rotate(180deg); color: #4B5563; font-size: 0.68rem; font-weight: 600; white-space: nowrap; letter-spacing: 1px; text-transform: uppercase; text-align: center; line-height: 1.2;">
                 Dhanbad<br>Mines
             </div>
         </div>
@@ -467,9 +471,6 @@ else:
                 except Exception as ex:
                     st.error(f"Error: {ex}")
 
-    # orange divider after active project row
-    st.markdown('<div style="margin-top:8px;margin-bottom:12px;"><hr style="border:0;height:6px;background:#E8A020;border-radius:3px;margin:0;"></div>', unsafe_allow_html=True)
-
 if st.session_state.get("show_new_project"):
     st.markdown("---")
     st.markdown('<div class="section-title">New Project</div>', unsafe_allow_html=True)
@@ -515,11 +516,40 @@ milestones_df = get_milestones(pid)
 # ══════════════════════════════════════════════════════════════════
 page = st.session_state.current_page
 
+milestone_section = "update"
+if hasattr(st, "query_params"):
+    milestone_section = st.query_params.get("section", milestone_section)
+    if isinstance(milestone_section, list):
+        milestone_section = milestone_section[0] if milestone_section else "update"
+else:
+    qp = st.experimental_get_query_params()
+    milestone_section = qp.get("section", [milestone_section])[0]
+
+if milestone_section not in {"update", "add"}:
+    milestone_section = "update"
+else:
+    st.session_state.current_page = "Milestones"
+    page = "Milestones"
+
 if page == "Milestones":
-    st.markdown(f"## Milestones — {pname}")
-    update_form.render(milestones_df, project_start)
-    st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
-    add_milestone.render(pid)
+    st.markdown(
+        """
+        <div class="milestone-menu-wrap">
+          <div class="milestone-menu-trigger">Milestones</div>
+          <div class="milestone-menu-content">
+            <a href="?section=update">Update Milestone</a>
+            <a href="?section=add">Add Milestone</a>
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    if milestone_section == "add":
+        st.markdown("## Add Milestone", unsafe_allow_html=True)
+        add_milestone.render(pid)
+    else:
+        st.markdown("## Update Milestone", unsafe_allow_html=True)
+        update_form.render(milestones_df, project_start)
 
 elif page == "Reports":
     st.markdown(f"## Reports — {pname}")
@@ -546,13 +576,7 @@ elif page == "Reports":
     reports_dashboard.render(active_project_id=pid)
 
 elif page == "Dashboard":
-    # show project name on dashboard area and a thicker saffron divider
-    st.markdown(f"""
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;margin-bottom:8px;">
-      <div style="font-weight:700;color:var(--navy);font-size:1.05rem;padding-left:6px;">{pname}</div>
-    </div>
-    <div style="height:8px;background:#E8A020;border-radius:4px;margin-bottom:18px;"></div>
-    """, unsafe_allow_html=True)
+    st.markdown("## Dashboard")
     dashboard.render(pid, pname, milestones_df)
 
 elif page == "Monitor & Alerts":
