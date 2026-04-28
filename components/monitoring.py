@@ -11,13 +11,13 @@ from utils.constants import TODAY
 
 def render(milestones_df):
     if not require_role("Manager"): return
-        st.markdown('''<div style="background:#E9EFF8;border:1px solid #003366;border-radius:8px;padding:10px 16px;margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center;max-width:100%;">
-            <span style="color:#003366;font-family:'IBM Plex Mono',monospace;font-size:0.8rem;">[Monitor] MONITORING ENGINE</span>
-            <span style="color:#4B5563;font-size:0.75rem;">Simulated date: <strong style="color:#1F2937;">March 10, 2026</strong> &nbsp;·&nbsp; [OK] &gt;7d &nbsp;[WARN] 3–7d &nbsp;[CRIT] &lt;3d / overdue</span>
-        </div>''', unsafe_allow_html=True)
-        _, cb, _ = st.columns([1, 1.2, 1])
-        with cb:
-                run_check = st.button("Run Deadline Check", type="primary", use_container_width=True)
+    st.markdown('''<div style="background:#E9EFF8;border:1px solid #003366;border-radius:8px;padding:10px 16px;margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center;max-width:100%;">
+      <span style="color:#003366;font-family:'IBM Plex Mono',monospace;font-size:0.8rem;">[Monitor] MONITORING ENGINE</span>
+      <span style="color:#4B5563;font-size:0.75rem;">Simulated date: <strong style="color:#1F2937;">March 10, 2026</strong> &nbsp;·&nbsp; [OK] &gt;7d &nbsp;[WARN] 3–7d &nbsp;[CRIT] &lt;3d / overdue</span>
+    </div>''', unsafe_allow_html=True)
+    _, cb, _ = st.columns([1, 1.2, 1])
+    with cb:
+        run_check = st.button("Run Deadline Check", type="primary", use_container_width=True)
     if milestones_df.empty: st.info("No milestones to monitor."); return
     milestones = []
     for _, r in milestones_df.iterrows():
