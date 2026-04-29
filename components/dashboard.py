@@ -34,13 +34,20 @@ def render(project_id, project_name, milestones_df):
     with col1:
         st.markdown(f"## {project_name}")
     with col2:
-        if st.button("New Project", key="dashboard_new_proj", use_container_width=True):
-            st.session_state.show_create_modal_main = True
+        button_label = "Back" if st.session_state.get("show_create_modal_main") else "New Project"
+        if st.button(button_label, key="dashboard_new_proj", use_container_width=True):
+            st.session_state.show_create_modal_main = not st.session_state.get("show_create_modal_main", False)
     
     # Modal form for new project
     if st.session_state.get("show_create_modal_main"):
         st.markdown('<div style="background:#EEF2F7;border:1px solid #CBD5E0;border-radius:8px;padding:20px;margin-bottom:20px;">', unsafe_allow_html=True)
-        st.markdown('<h3 style="color:#1B3A6B;margin-top:0;">Create New Project</h3>', unsafe_allow_html=True)
+        header_col1, header_col2 = st.columns([0.8, 0.2])
+        with header_col1:
+            st.markdown('<h3 style="color:#1B3A6B;margin-top:0;">Create New Project</h3>', unsafe_allow_html=True)
+        with header_col2:
+            if st.button("Close", key="dashboard_close_proj_form", use_container_width=True):
+                st.session_state.show_create_modal_main = False
+                st.rerun()
         
         with st.form("new_project_form", clear_on_submit=True):
             c1, c2 = st.columns(2)

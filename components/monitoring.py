@@ -35,7 +35,7 @@ def render(milestones_df):
         bn = get_bottleneck(m["name"], info["days"], m["status"])
         if bn: bottlenecks.append((m["name"], bn))
         bn_html = f'<div style="margin-top:8px;padding:6px 10px;background:#FFF8E1;border-left:3px solid #C8950C;border-radius:4px;font-size:0.75rem;color:#C8950C;">[Gear] <strong>Bottleneck:</strong> Possible cause: {bn}</div>' if bn else ""
-                notes_html = f'<div style="font-size:0.73rem;color:#4B5563;margin-top:4px;">[Notes] {m["notes"]}</div>' if m.get("notes") else ""
+        notes_html = f'<div style="font-size:0.73rem;color:#4B5563;margin-top:4px;">[Notes] {m["notes"]}</div>' if m.get("notes") else ""
         st.markdown(f"""
         <div style="background:#E9EFF8;border:1px solid {info['color']};border-left:4px solid {info['color']};border-radius:8px;padding:12px 16px;margin-bottom:8px;">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">

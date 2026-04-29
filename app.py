@@ -487,8 +487,10 @@ else:
         st.session_state.selected_project_id   = opts[sel]
         st.session_state.selected_project_name = sel
     with proj_col2:
-        if role == "Manager" and st.button("+ New", key="new_proj_btn", use_container_width=True):
-            st.session_state.show_new_project = True
+        if role == "Manager":
+            toggle_label = "Back" if st.session_state.get("show_new_project") else "+ New"
+            if st.button(toggle_label, key="new_proj_btn", use_container_width=True):
+                st.session_state.show_new_project = not st.session_state.get("show_new_project", False)
     with proj_col3:
         if role == "Manager" and st.session_state.get("selected_project_id"):
             if st.button("Delete", key="del_proj_btn", use_container_width=True):
@@ -503,7 +505,13 @@ else:
 
 if st.session_state.get("show_new_project"):
     st.markdown('<div class="content-section"></div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">New Project</div>', unsafe_allow_html=True)
+    form_title_col, form_action_col = st.columns([0.82, 0.18])
+    with form_title_col:
+        st.markdown('<div class="section-title">New Project</div>', unsafe_allow_html=True)
+    with form_action_col:
+        if st.button("Close", key="close_new_proj_form", use_container_width=True):
+            st.session_state.show_new_project = False
+            st.rerun()
     with st.form("new_proj", clear_on_submit=True):
         c1, c2 = st.columns(2)
         with c1:
@@ -511,7 +519,15 @@ if st.session_state.get("show_new_project"):
             p_start = st.date_input("Start *",  value=TODAY)
         with c2:
             p_loc   = st.text_input("Location", placeholder="e.g. Dhanbad, JH")
-        if st.form_submit_button("Create Project", use_container_width=True):
+        form_col1, form_col2 = st.columns(2)
+        with form_col1:
+            create_clicked = st.form_submit_button("Create Project", use_container_width=True)
+        with form_col2:
+            cancel_clicked = st.form_submit_button("Cancel", use_container_width=True)
+        if cancel_clicked:
+            st.session_state.show_new_project = False
+            st.rerun()
+        if create_clicked:
             errs = ([] if p_name.strip() else ["Name required."]) + validate_project_start(p_start)
             if errs:
                 for e in errs: st.error(e)
